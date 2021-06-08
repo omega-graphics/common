@@ -1,0 +1,11 @@
+
+project = Project("omega-common","0.1")
+
+main_srcs = glob("./src/*.cpp")
+
+main_srcs += glob("./src/*.mm")
+
+main = Library(name="omega-common",source_files=main_srcs,shared=True,dependencies=[],output_dir="./out/lib")
+main.add_include_dirs(["./include"])
+
+project.add_targets([main])
