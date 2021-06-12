@@ -1,8 +1,38 @@
 #include "fs.h"
 
+#include <unistd.h>
+#include <dirent.h>
+
 #import <Foundation/Foundation.h>
 
 namespace OmegaCommon::FS { 
+
+    bool Path::isDirectory(){
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSString *str = [[NSString alloc] initWithUTF8String:_str.c_str()];
+        NSError *error;
+        NSDictionary<NSFileAttributeKey,id> * dict = [fileManager attributesOfItemAtPath:str error:&error];
+        NSFileAttributeType fileType = dict[NSFileType];
+        return fileType == NSFileTypeDirectory;
+    };
+
+    bool Path::isFile(){
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSString *str = [[NSString alloc] initWithUTF8String:_str.c_str()];
+        NSError *error;
+        NSDictionary<NSFileAttributeKey,id> * dict = [fileManager attributesOfItemAtPath:str error:&error];
+        NSFileAttributeType fileType = dict[NSFileType];
+        return fileType == NSFileTypeRegular;
+    };
+
+    bool Path::isSymLink(){
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSString *str = [[NSString alloc] initWithUTF8String:_str.c_str()];
+        NSError *error;
+        NSDictionary<NSFileAttributeKey,id> * dict = [fileManager attributesOfItemAtPath:str error:&error];
+        NSFileAttributeType fileType = dict[NSFileType];
+        return fileType == NSFileTypeSymbolicLink;
+    };
 
     StatusCode changeCWD(Path newPath){
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -49,6 +79,10 @@ namespace OmegaCommon::FS {
         else {
             return Failed;
         };
+    };
+
+    DirectoryIterator::DirectoryIterator(Path path):path(path){
+        DIR * dir = opendir(path.str().c_str());
     };
     
 };

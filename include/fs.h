@@ -6,7 +6,7 @@
 namespace OmegaCommon {
     namespace FS {
         class Path {
-        String _str;
+            String _str;
             struct Token {
                 typedef enum : int {
                     ID,
@@ -49,6 +49,16 @@ namespace OmegaCommon {
         StatusCode createDirectory(Path path);
 
         StatusCode deleteDirectory(Path path);
+
+        class DirectoryIterator {
+            Path path;
+            bool _end;
+            using SELF = DirectoryIterator;
+        public:
+            bool & end();
+            explicit DirectoryIterator(Path path);
+            SELF & operator++();
+        };
     };
 };
 
