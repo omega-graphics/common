@@ -1,0 +1,18 @@
+#! mode = python3
+
+Project("omega-common","0.1")
+
+main_srcs = [
+    "./src/common.cpp",
+    "./src/fs.cpp",
+    "./src/crt.c"
+]
+
+if is_mac:
+    main_srcs += glob("./src/*.mm")
+
+SharedLibrary("omega-common",main_srcs,[],"lib")
+set_property("omega-common","include_dirs",["./include"])
+
+# project.add_targets([main])
+# project.install_targets("omega_common_lib",[main],"lib")

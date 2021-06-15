@@ -27,7 +27,7 @@ namespace OmegaCommon {
                     out << "{Type:" << int(it->type) << ",Content:" << it->str << "}, " << std::flush;
                     ++it;
                 };
-                return out.str();
+                return out.str().c_str();
             };
             String &str();
             String filename();

@@ -1,4 +1,4 @@
-#include "fs.h"
+#include "omega-common/fs.h"
 
 #include <unistd.h>
 #include <dirent.h>
