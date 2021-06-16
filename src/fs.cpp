@@ -88,7 +88,7 @@
     };
 
     String Path::dir(){
-        
+
     };
 
     String & Path::ext(){
@@ -144,6 +144,14 @@
     Path & Path::append(TStrRef & str){
         _str += PATH_SLASH + str;
         return *this;
+    };
+
+    Path::Path(const char *str){
+        parse(str);
+    };
+
+    Path::Path(const String & str){
+        parse(str);
     };
 
     
