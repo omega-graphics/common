@@ -172,4 +172,8 @@
         
     };
 
+    bool & DirectoryIterator::end(){
+        return _end;
+    };
+
  };

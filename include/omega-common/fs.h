@@ -118,6 +118,9 @@ namespace OmegaCommon {
             bool _end;
             using SELF = DirectoryIterator;
             void *data;
+            #ifdef _WIN32
+            void *dirp;
+            #endif
             long loc;
         public:
             bool & end();
