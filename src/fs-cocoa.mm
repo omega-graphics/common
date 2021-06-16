@@ -82,7 +82,7 @@ namespace OmegaCommon::FS {
         };
     };
 
-    DirectoryIterator::DirectoryIterator(Path path):path(path){
+    DirectoryIterator::DirectoryIterator(Path path):path(path),result_path(""){
         DIR * dir = opendir(path.str().c_str());
         data = dir;
     };
@@ -90,26 +90,21 @@ namespace OmegaCommon::FS {
     DirectoryIterator & DirectoryIterator::operator++(){
         DIR *dir = (DIR *)data;
         ++loc;
-        seekdir(dir,loc);
-        if(readdir(dir) == NULL)
+        dirent *ent;
+        if((ent = readdir(dir)) == NULL) {
             _end = true;
-        seekdir(dir,loc);
+            result_path = "";
+        }
+        else 
+        {
+            TStrRef view(ent->d_name,ent->d_namlen);
+            result_path = path + "/" + view;
+        }
         return *this;
     };
 
     Path DirectoryIterator::operator*(){
-        DIR *dir = (DIR *)data;
-        dirent *ent;
-        if((ent = readdir(dir)) != NULL){
-            loc = ent->d_seekoff;
-            auto fullPath = path + ent->d_name;
-            seekdir(dir,loc);
-            return fullPath;
-        }   
-        else {
-            _end = true;
-            return "";
-        };
+        return result_path;
     };
     
 };

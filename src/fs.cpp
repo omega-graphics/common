@@ -1,9 +1,17 @@
  #include "omega-common/fs.h"
  #include <cctype>
- 
+ #include "omega-common/utils.h"
+
+#if defined(_WIN32)
+#define PATH_SLASH "\\"
+#else 
+#define PATH_SLASH "/"
+#endif
  namespace OmegaCommon::FS {
  
     void Path::parse(const String & str){
+
+
 
         // Core::Regex regex(R"(([\w|_|\/|\.]*)\/(\w+)(?:\.(\w+))?$)");
 
@@ -120,26 +128,32 @@
 
 
     Path & Path::append(const char *str){
-        // std::string_view _view(str);
-        #ifdef _WIN32
-        _str += "\\" + str;
-        #else
-        _str + "/" + str;
-        #endif
+        _str = _str + PATH_SLASH + str;
         return *this;
     };
 
     Path & Path::append(String & str){
-        _str + "/" + str;
+        _str += PATH_SLASH + str;
         return *this;
     };
 
+    Path & Path::append(TStrRef & str){
+        _str += PATH_SLASH + str;
+        return *this;
+    };
+
+    
+
     Path Path::operator+(const char *str){
-        return _str + "/" + str;
+        return _str + PATH_SLASH + str;
     };
 
     Path Path::operator+(String & str){
-        return _str + "/" + str;
+        return _str + PATH_SLASH + str;
+    };
+
+    Path Path::operator+(TStrRef & str){
+        return _str + PATH_SLASH + str;
     };
 
     Path::~Path(){

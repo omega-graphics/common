@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <sys/_types/_int32_t.h>
+#include <type_traits>
 #include <vector>
 #include <map>
 #include <cstring>
@@ -118,6 +119,9 @@ namespace OmegaCommon {
     typedef std::u32string UString;
     typedef std::wstring WString;
 
+    /** 
+      Immutable Reference to a String.
+    */
     template<class CharTY>
     class StrRefBase {
         CharTY *_data;
@@ -127,8 +131,6 @@ namespace OmegaCommon {
         size_type _len;
         using SELF = StrRefBase<CharTY>;
     public:
-        using iterator = CharTY *;
-        using reference = CharTY &;
         using const_iterator = const CharTY *;
         using const_reference = const CharTY &;
 
@@ -138,16 +140,10 @@ namespace OmegaCommon {
         CharTY *data(){
             return _data;
         }
-        iterator begin(){
-            return iterator(_data);
-        }
-        iterator end(){
-            return iterator(_data + _len);
-        }
-        const_iterator cbegin(){
+        const_iterator begin(){
             return const_iterator(_data);
         }
-        const_iterator cend(){
+        const_iterator end(){
             return const_iterator(_data + _len);
         }
 
@@ -168,6 +164,15 @@ namespace OmegaCommon {
     typedef StrRefBase<wchar_t> WStrRef;
     typedef StrRefBase<char32_t> UStrRef;
 
+
+    String operator+(const String & lhs,TStrRef & rhs);
+    WString operator+(const WString & lhs,WStrRef & rhs);
+    UString operator+(const UString & lhs,UStrRef & rhs);
+
+    void operator+=(String & lhs,TStrRef & rhs);
+    void operator+=(WString & lhs,WStrRef & rhs);
+    void operator+=(UString & lhs,UStrRef & rhs);
+
     TStrRef operator&(String & str);
     WStrRef operator&(WString & str);
     UStrRef operator&(UString & str);
@@ -175,8 +180,136 @@ namespace OmegaCommon {
     template<class T>
     using Vector = std::vector<T>;
 
+    template<class T,unsigned len>
+    using Array = std::array<T,len>;
+
+    /** 
+      The base class for all container reference classes.
+    */
+    template<class T>
+    class ContainerRefBase {
+    protected:
+        T *_data;
+    public:
+        typedef unsigned size_type;
+    protected:
+        size_type _size;
+    public:
+        using const_iterator = const T *;
+        using const_reference = const T &;
+
+        bool empty() noexcept{
+            return _size == 0;
+        };
+
+        size_type & size(){
+            return _size;
+        };
+        
+        const_iterator begin(){
+            return const_iterator(_data);
+        };
+        const_iterator end(){
+            return const_iterator(_data + _size);
+        };
+
+        const_reference front(){
+            return begin()[0];
+        };
+
+        const_reference back(){
+            return end()[-1];
+        };
+
+        template<class _iterator>
+        ContainerRefBase(_iterator _st,_iterator _end):_data(_st),_size(_end - _st){
+
+        };
+
+        ContainerRefBase(T * data,size_type len):_data(data),_size(len){
+
+        };
+    };
+
+    /** 
+      An immutable reference to an Array or Vector
+    */
+    template<class T>
+    class ArrayRef : public ContainerRefBase<T>{
+        using super = ContainerRefBase<T>;
+    public:
+        typedef typename super::const_reference const_reference;
+        typedef typename super::size_type size_type;
+
+        const_reference operator[](size_type idx){
+            assert(idx < this->size() && "Index must be smaller than the size of the ArrayRef");
+            return this->begin()[idx];
+        };
+        
+
+        ArrayRef(Vector<T> & vec):ContainerRefBase<T>(vec.begin(),vec.end()){
+            
+        };
+
+        template<unsigned len>
+        ArrayRef(Array<T,len> & array):ContainerRefBase<T>(array.data(),len){
+            
+        };
+
+        operator Vector<T>(){
+            return {this->begin(),this->end()};
+        }
+    };
+
+    template<class T>
+    ArrayRef<T> operator&(Vector<T> & other){
+        return other;
+    };
+
     template<class K,class V>
     using Map = std::map<K,V>;
+
+    /** 
+      An immutable reference to an Map
+    */
+    template<class K,class V>
+    class MapRef : public ContainerRefBase<std::pair<K,V>>{
+        using super = ContainerRefBase<std::pair<K,V>>;
+    public:
+        typedef typename super::size_type size_type;
+        typedef typename super::const_iterator const_iterator;
+        typedef typename super::const_reference const_reference;
+
+        typedef std::add_lvalue_reference<std::add_const<typename const_reference::first_type>> const_key_ref;
+        typedef std::add_lvalue_reference<std::add_const<typename const_reference::second_type>> const_val_ref;
+        
+        const_iterator find(const_key_ref key){
+            auto it = this->begin();
+            for(;it != this->end();it++){
+                if(it->first == key)
+                    break;
+            };
+            return it;
+        };
+
+        const_val_ref operator[](const_key_ref key){
+            auto res = find(key);
+            return res->second;
+        };
+
+        MapRef(Map<K,V> & map):ContainerRefBase<std::pair<K,V>>(map.begin(),map.end()){
+
+        };
+
+        operator Map<K,V>(){
+            return {this->begin(),this->end()};
+        };
+    };
+
+    template<class K,class V>
+    MapRef<K,V> operator&(Map<K,V> & other){
+        return other;
+    };
 
     typedef enum : int {
         Ok,

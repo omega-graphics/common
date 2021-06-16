@@ -51,11 +51,20 @@ namespace OmegaCommon {
             */
             SELF & append(String & str);
 
+            /**
+             Appends a TStrRef to the end of the path.
+             @param str 
+             @returns Path
+            */
+            SELF & append(TStrRef & str);
+
             /// @name Concat Operators
             /// @{
             SELF operator+(const char *str);
 
             SELF operator+(String & str);
+
+             SELF operator+(TStrRef & str);
             /// @}
             /**
              Retrieve the path as a string. (Relative path) 
@@ -99,6 +108,7 @@ namespace OmegaCommon {
 
         class DirectoryIterator {
             Path path;
+            Path result_path;
             bool _end;
             using SELF = DirectoryIterator;
             void *data;
