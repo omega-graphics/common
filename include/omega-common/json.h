@@ -1,4 +1,6 @@
 #include "utils.h"
+#include <initializer_list>
+#include <istream>
 #include <sstream>
 
 #ifndef OMEGA_COMMON_JSON_H
@@ -7,9 +9,18 @@
 namespace OmegaCommon {
 
     class JSONParser;
+    class JSONSerializer;
 
+    /**
+     @brief A simple class for parsing and serializing JSON, and for defining all of the JSON structures and data types.
+     (Represents a single JSON object node in a JSON tree.)
+     @paragraph 
+     An instance of this class represents a single JSON Object Node in the JSON object tree.
+    */
     class JSON {
         static std::unique_ptr<JSONParser> parser;
+
+        static std::unique_ptr<JSONSerializer> serializer;
 
         static JSON __parse(std::istream & in);
         static void __serialize(JSON &json,std::ostream & out);
@@ -18,14 +29,31 @@ namespace OmegaCommon {
 
         void *_data;
         friend class JSONParser;
+        friend class JSONSerializer;
     public:
+        JSON() = default;
 
+        /// Construct JSON as String
+        JSON(const char *c_str);
 
-        String asString();
+        /// Construct JSON as String
+        JSON(String str);
+
+        /// Construct JSON as Array
+        JSON(std::initializer_list<JSON> array);
         
-        Vector<JSON> asVector();
+        /// Construct JSON as Map
+        JSON(std::map<String,JSON> map);
 
-        Map<String,JSON> asMap();
+        /// Get this JSON node as a String.
+        String & asString();
+        
+        /// Get this JSON node as a Vector 
+        /// (From a JSON Array).
+        Vector<JSON> & asVector();
+
+        /// Get this JSON node as a Map.
+        Map<String,JSON> & asMap();
 
         float asFloat();
 
@@ -35,23 +63,30 @@ namespace OmegaCommon {
 
         static JSON parse(String str);
 
-        static JSON parse(std::istringstream & in);
+        static JSON parse(std::istream & in);
 
-        static JSON parse(std::ifstream & in);
+        static String serialize(JSON & json);
 
+        static void serialize(JSON & json,std::ostream & out);
 
-        static String serialize(JSON json);
-
-        static void serialize(JSON json,std::ofstream & out);
-
-        static void serialize(JSON json,std::ostringstream & out);
-    
+     
     };
 
     std::istream & operator>>(std::istream & in,JSON & json);
-    std::ostream & operator<<(std::ostream & in,JSON & json);
+    std::ostream & operator<<(std::ostream & out,JSON & json);
+
+    #define JSON_MAP Map<String,JSON>
+    #define JSON_ARRAY Vector<JSON>
+
+    struct JSONConvertible {
+        virtual void toJSON(JSON & j) = 0;
+        virtual void fromJSON(JSON & j) = 0;
+    };
+
+    #define IJSONConvertible public ::OmegaCommon::JSONConvertible
 
 };
+
 
 
 

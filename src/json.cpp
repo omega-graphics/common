@@ -4,6 +4,9 @@
 #include <sstream>
 #include <iostream>
 
+#undef JSON_ARRAY 
+#undef JSON_MAP
+
 namespace OmegaCommon {
     
     struct JSONTok {
@@ -191,22 +194,132 @@ namespace OmegaCommon {
         };
 
         void finish(){
-
+            lexer->finish();
         };
     };
 
 
 
     class JSONSerializer {
+        std::ostream * out;
+    public:
+        void setOutputStream(std::ostream * out){
+            this->out = out;
+        };
+        void serializeToStream(JSON & j){
+            auto & out = *this->out;
+            if(j.ty == JSON_MAP){
+                out << "{";
+                auto & map = j.asMap();
+                for(auto it = map.begin();it != map.end();it++){
+                    if(it == map.begin())
+                        out << ",";
+                    auto & ent = *it;
+                    out << "\"" << ent.first << "\":";
+                    serializeToStream(ent.second);
+                    ++it;
+                };
+                out << "}";
+            }
+            else if(j.ty == JSON_ARRAY){
+                out << "[";
+                auto & vec = j.asVector();
+                for(auto it = vec.begin();it != vec.end();it++){
+                    if(it == vec.end())
+                        out << ",";
+                    auto & ent = *it;
+                    serializeToStream(ent);
+                    ++it;
+                };
+                out << "]";
+            }
+            else if(j.ty == JSON_STR){
+                out << "\"" << j.asString() << "\"";
+            };
+        };
+        void serialize(JSON & j){
+            serializeToStream(j);
+        };
+        void finish(){
+            out = nullptr;
+        };
+    };
 
+    Map<String,JSON> & JSON::asMap(){
+        assert(ty == JSON_MAP);
+        return *(Map<String,JSON> *)_data;
+    };
+
+    Vector<JSON> & JSON::asVector(){
+        assert(ty == JSON_ARRAY);
+        return *(Vector<JSON> *)_data;
+    };
+
+    String & JSON::asString(){
+        assert(ty == JSON_STR);
+        return *(String *)_data;
     };
 
     std::unique_ptr<JSONParser> JSON::parser = std::make_unique<JSONParser>();
 
+    std::unique_ptr<JSONSerializer> JSON::serializer = std::make_unique<JSONSerializer>();
+
+
+    
     JSON JSON::parse(String str){
         std::istringstream in(str);
         parser->setInputStream(&in);
-        return parser->parse();
+        auto j = parser->parse();
+        parser->finish();
+        return j;
+    };
+
+    JSON JSON::parse(std::istream & in){
+        parser->setInputStream(&in);
+        auto j = parser->parse();
+        parser->finish();
+        return j;
+    };
+
+    String JSON::serialize(JSON & j){
+        std::ostringstream out;
+        serialize(j,out);
+        return out.str();
+    };
+
+    void JSON::serialize(JSON & j,std::ostream & out){
+        serializer->setOutputStream(&out);
+        serializer->serialize(j);
+        serializer->finish();
+    };
+
+    JSON::JSON(const char *c_str):ty(JSON_STR),_data(new String(c_str)){
+
+    };
+
+     /// Construct JSON as String
+    JSON::JSON(String str):ty(JSON_STR),_data(new String(str)){
+
+    };
+
+    /// Construct JSON as Array
+    JSON::JSON(std::initializer_list<JSON> array):ty(JSON_ARRAY),_data(new Vector<JSON>(array)){
+
+    };
+        
+    /// Construct JSON as Map
+    JSON::JSON(std::map<String,JSON> map):ty(JSON_MAP),_data(new Map<String,JSON>(map)){
+
+    };
+
+    std::istream & operator>>(std::istream & in,JSON & json){
+        json = JSON::parse(in);
+        return in;
+    };
+
+    std::ostream & operator<<(std::ostream & out,JSON & json){
+        // JSON::serialize(json,out);
+        return out;
     };
 
 

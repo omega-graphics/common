@@ -1,5 +1,6 @@
 #include "omega-common/fs.h"
 
+#include <cstdio>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -83,6 +84,32 @@ namespace OmegaCommon::FS {
 
     DirectoryIterator::DirectoryIterator(Path path):path(path){
         DIR * dir = opendir(path.str().c_str());
+        data = dir;
+    };
+
+    DirectoryIterator & DirectoryIterator::operator++(){
+        DIR *dir = (DIR *)data;
+        ++loc;
+        seekdir(dir,loc);
+        if(readdir(dir) == NULL)
+            _end = true;
+        seekdir(dir,loc);
+        return *this;
+    };
+
+    Path DirectoryIterator::operator*(){
+        DIR *dir = (DIR *)data;
+        dirent *ent;
+        if((ent = readdir(dir)) != NULL){
+            loc = ent->d_seekoff;
+            auto fullPath = path + ent->d_name;
+            seekdir(dir,loc);
+            return fullPath;
+        }   
+        else {
+            _end = true;
+            return "";
+        };
     };
     
 };

@@ -112,7 +112,7 @@ namespace OmegaCommon {
 
     typedef StringBaseImpl<char> OMTString;
     typedef StringBaseImpl<wchar_t> OMWString;
-    typedef StringBaseImpl<int32_t> OMUString;
+    typedef StringBaseImpl<char32_t> OMUString;
 
     typedef std::string String;
     typedef std::u32string UString;
@@ -166,7 +166,7 @@ namespace OmegaCommon {
 
     typedef StrRefBase<char> TStrRef;
     typedef StrRefBase<wchar_t> WStrRef;
-    typedef StrRefBase<int32_t> UStrRef;
+    typedef StrRefBase<char32_t> UStrRef;
 
     TStrRef operator&(String & str);
     WStrRef operator&(WString & str);

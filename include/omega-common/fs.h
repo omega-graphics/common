@@ -5,6 +5,13 @@
 
 namespace OmegaCommon {
     namespace FS {
+
+        /**
+        @brief A platform specific filesystem path class.
+        @paragraph 
+        In addition to performing basic path parsing on construction and runtime, 
+        it supports rapid string concatnation as well absolute path resolution.
+        */
         class Path {
             String _str;
             struct Token {
@@ -18,6 +25,7 @@ namespace OmegaCommon {
             };
             Vector<Token> tokens;
             void parse(const String & str);
+            typedef Path SELF;
         public:
             const unsigned getTokenCount(){ return tokens.size();};
             String debugString(){
@@ -29,9 +37,48 @@ namespace OmegaCommon {
                 };
                 return out.str().c_str();
             };
+            /**
+             Appends a CString to the end of the path.
+             @param str 
+             @returns Path
+            */
+            SELF & append(const char *str);
+
+            /**
+             Appends a String to the end of the path.
+             @param str 
+             @returns Path
+            */
+            SELF & append(String & str);
+
+            /// @name Concat Operators
+            /// @{
+            SELF operator+(const char *str);
+
+            SELF operator+(String & str);
+            /// @}
+            /**
+             Retrieve the path as a string. (Relative path) 
+             @returns String &
+            */
             String &str();
+
+            /**
+             Retrieves the filename part of the path (if it has one).
+             @returns String
+            */
             String filename();
+
+            /**
+             Retrieves the file extension of the path (if it has one).
+             @returns String
+            */
             String & ext();
+
+            /**
+             Retrieves the file extension of the path (if it has one).
+             @returns String
+            */
             String absPath();
             bool exists();
             Path(const char * str);
@@ -54,9 +101,12 @@ namespace OmegaCommon {
             Path path;
             bool _end;
             using SELF = DirectoryIterator;
+            void *data;
+            long loc;
         public:
             bool & end();
             explicit DirectoryIterator(Path path);
+            Path operator*();
             SELF & operator++();
         };
     };

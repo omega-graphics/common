@@ -118,4 +118,32 @@
         return _str;
     };
 
+
+    Path & Path::append(const char *str){
+        // std::string_view _view(str);
+        #ifdef _WIN32
+        _str += "\\" + str;
+        #else
+        _str + "/" + str;
+        #endif
+        return *this;
+    };
+
+    Path & Path::append(String & str){
+        _str + "/" + str;
+        return *this;
+    };
+
+    Path Path::operator+(const char *str){
+        return _str + "/" + str;
+    };
+
+    Path Path::operator+(String & str){
+        return _str + "/" + str;
+    };
+
+    Path::~Path(){
+        
+    };
+
  };
