@@ -87,6 +87,10 @@
         
     };
 
+    String Path::dir(){
+        
+    };
+
     String & Path::ext(){
         // if(tokens.back().type == Token::ID && tokens[tokens.size() - 2].type == Token::Dot){
         //     return tokens.back().str;

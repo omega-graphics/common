@@ -73,6 +73,12 @@ namespace OmegaCommon {
             String &str();
 
             /**
+             Retrieves the top directory part of the path (if it has one).
+             @returns String
+            */
+            String dir();
+
+            /**
              Retrieves the filename part of the path (if it has one).
              @returns String
             */

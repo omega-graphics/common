@@ -1,13 +1,11 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <sys/_types/_int32_t.h>
 #include <type_traits>
 #include <vector>
 #include <map>
 #include <cstring>
 
-#include "crt.h"
 
 #ifndef OMEGA_COMMON_COMMON_UTILS_H
 #define OMEGA_COMMON_COMMON_UTILS_H
