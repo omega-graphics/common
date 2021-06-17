@@ -14,9 +14,10 @@ if is_mac:
 elif is_win:
     main_srcs += ["./src/fs-win.cpp"]
 
+Config("omega-common_conf",[],["./include"],[])
 
 StaticLibrary("omega-common",main_srcs,[],"lib")
-set_property("omega-common","include_dirs",["./include"])
+set_property("omega-common","configs",["omega-common_conf"])
 set_property("omega-common","frameworks",["Foundation.framework"])
 
 # project.add_targets([main])
