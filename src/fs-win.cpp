@@ -22,6 +22,22 @@ namespace OmegaCommon::FS {
         return attrs & FILE_ATTRIBUTE_REPARSE_POINT;
     };
 
+    String Path::absPath(){
+        if(isRelative){
+            CHAR buffer[MAX_PATH];
+            GetCurrentDirectoryA(MAX_PATH,buffer);
+            if(_dir.front() == '.')
+                return buffer + _dir.substr(1,_dir.size()-1) + PATH_SLASH + _fname + "." + _ext;
+            else 
+                return std::string(buffer) + PATH_SLASH + _dir + _fname + "." + _ext;
+
+        }
+        else {
+            return _dir + PATH_SLASH + _fname + "." + _ext;
+        }
+        
+    };
+
 
     StatusCode createDirectory(Path path){
         BOOL success = CreateDirectoryA(path.absPath().c_str(),NULL);

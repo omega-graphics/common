@@ -2,16 +2,22 @@
  #include <cctype>
  #include "omega-common/utils.h"
 
-#if defined(_WIN32)
-#define PATH_SLASH "\\"
-#else 
-#define PATH_SLASH "/"
-#endif
+
  namespace OmegaCommon::FS {
+
+    struct Token {
+        typedef enum : int {
+            ID,
+            Dot,
+            Slash,
+        } Type;
+        Type type;
+        String str;
+    };
  
     void Path::parse(const String & str){
 
-
+        Vector<Token> tokens;
 
         // Core::Regex regex(R"(([\w|_|\/|\.]*)\/(\w+)(?:\.(\w+))?$)");
 
@@ -49,7 +55,7 @@
                 //     cont = false;
                 //     break;
                 // }
-                case '/' : {
+                case PATH_SLASH : {
                     *buffer_ptr = c;
                     ++buffer_ptr;
                     clear_buffer(Token::Slash);
@@ -61,12 +67,6 @@
                     clear_buffer(Token::Dot);
                     break;
                 }
-                case '\\' : {
-                    *buffer_ptr = c;
-                    ++buffer_ptr;
-                    clear_buffer(Token::Slash);
-                    break;
-                };
                 case ' ' : {
                     break;
                 }
@@ -84,46 +84,40 @@
             ++idx;
         };
         
-        
-    };
 
-    String Path::dir(){
-
-    };
-
-    String & Path::ext(){
-        // if(tokens.back().type == Token::ID && tokens[tokens.size() - 2].type == Token::Dot){
-        //     return tokens.back().str;
-        // }
-        return tokens.back().str;
-    };
-
-    String Path::filename(){
-        String res = "";
-        auto it = tokens.begin();
-        while(it != tokens.end()){
-            auto &type  = it->type;
-            if(type == Token::ID){
+        auto it = tokens.rbegin();
+        _dir = "";
+        while(it != tokens.rend()){
+            auto & tok = *it;
+            if(tok.type == Token::ID && it == tokens.rbegin()){
                 ++it;
-                auto & type = it->type;
-                if(type == Token::Dot){
-                    res.append((it - 1)->str);
-                    if(it == (tokens.end() - 2)){
-                        return res;
-                        break;
-                    };
-                    
-                    while(it != (tokens.end() - 2)){
-                        res.append(it->str);
-                        ++it;
-                    };
-                    return res;
-                    break;
+                auto & tok2 = *it;
+                if(tok.type == Token::Dot){
+                    _ext = tok.str;
                 };
+                _fname = tok2.str;
+            }
+            else {
+                _dir += tok.str;
             };
             ++it;
         };
-        return "";
+
+        isRelative = tokens.front().type == Token::Dot || tokens.front().type == Token::ID;
+           
+        
+    };
+
+    String & Path::dir(){
+        return _dir;
+    };
+
+    String & Path::ext(){
+        return _ext;
+    };
+
+    String & Path::filename(){
+        return _fname;
     };
 
     String & Path::str(){
@@ -142,7 +136,7 @@
     };
 
     Path & Path::append(TStrRef & str){
-        _str += PATH_SLASH + str;
+        _str = _str + PATH_SLASH + str;
         return *this;
     };
 

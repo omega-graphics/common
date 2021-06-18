@@ -3,6 +3,12 @@
 #ifndef OMEGA_COMMON_FS_H
 #define OMEGA_COMMON_FS_H
 
+#if defined(_WIN32)
+#define PATH_SLASH '\\'
+#else 
+#define PATH_SLASH '/'
+#endif
+
 namespace OmegaCommon {
     namespace FS {
 
@@ -14,29 +20,26 @@ namespace OmegaCommon {
         */
         class Path {
             String _str;
-            struct Token {
-                typedef enum : int {
-                    ID,
-                    Dot,
-                    Slash,
-                } Type;
-                Type type;
-                String str;
-            };
-            Vector<Token> tokens;
+            
+            String _dir;
+            String _fname;
+            String _ext;
+
+            bool isRelative;
+
             void parse(const String & str);
             typedef Path SELF;
         public:
-            const unsigned getTokenCount(){ return tokens.size();};
-            String debugString(){
-                std::ostringstream out;
-                auto it = tokens.begin();
-                while(it != tokens.end()){
-                    out << "{Type:" << int(it->type) << ",Content:" << it->str << "}, " << std::flush;
-                    ++it;
-                };
-                return out.str().c_str();
-            };
+            // const unsigned getTokenCount(){ return tokens.size();};
+            // String debugString(){
+            //     std::ostringstream out;
+            //     auto it = tokens.begin();
+            //     while(it != tokens.end()){
+            //         out << "{Type:" << int(it->type) << ",Content:" << it->str << "}, " << std::flush;
+            //         ++it;
+            //     };
+            //     return out.str().c_str();
+            // };
             /**
              Appends a CString to the end of the path.
              @param str 
@@ -76,13 +79,13 @@ namespace OmegaCommon {
              Retrieves the top directory part of the path (if it has one).
              @returns String
             */
-            String dir();
+            String & dir();
 
             /**
              Retrieves the filename part of the path (if it has one).
              @returns String
             */
-            String filename();
+            String & filename();
 
             /**
              Retrieves the file extension of the path (if it has one).
@@ -91,7 +94,7 @@ namespace OmegaCommon {
             String & ext();
 
             /**
-             Retrieves the file extension of the path (if it has one).
+             Gets the absolute path of this path
              @returns String
             */
             String absPath();
