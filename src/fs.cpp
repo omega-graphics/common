@@ -17,6 +17,8 @@
  
     void Path::parse(const String & str){
 
+        _str = str;
+
         Vector<Token> tokens;
 
         // Core::Regex regex(R"(([\w|_|\/|\.]*)\/(\w+)(?:\.(\w+))?$)");
@@ -55,7 +57,13 @@
                 //     cont = false;
                 //     break;
                 // }
-                case PATH_SLASH : {
+                case '/' : {
+                    *buffer_ptr = c;
+                    ++buffer_ptr;
+                    clear_buffer(Token::Slash);
+                    break;
+                };
+                case '\\' : {
                     *buffer_ptr = c;
                     ++buffer_ptr;
                     clear_buffer(Token::Slash);
@@ -92,13 +100,19 @@
             if(tok.type == Token::ID && it == tokens.rbegin()){
                 ++it;
                 auto & tok2 = *it;
-                if(tok.type == Token::Dot){
+                if(tok2.type == Token::Dot){
                     _ext = tok.str;
                 };
-                _fname = tok2.str;
+                ++it;
+                tok2 = *it;
+                if(tok2.type == Token::ID){
+                    _fname = tok2.str;
+                }
+                ++it;
+                
             }
             else {
-                _dir += tok.str;
+                _dir = tok.str + _dir;
             };
             ++it;
         };

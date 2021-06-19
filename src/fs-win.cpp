@@ -23,17 +23,23 @@ namespace OmegaCommon::FS {
     };
 
     String Path::absPath(){
+        auto n_dir = _dir;
+        for(auto & c : n_dir){
+            if(c == '/')
+                c = PATH_SLASH;
+        };
+
         if(isRelative){
             CHAR buffer[MAX_PATH];
             GetCurrentDirectoryA(MAX_PATH,buffer);
             if(_dir.front() == '.')
-                return buffer + _dir.substr(1,_dir.size()-1) + PATH_SLASH + _fname + "." + _ext;
+                return buffer + n_dir.substr(1,n_dir.size()-1) + PATH_SLASH + _fname + "." + _ext;
             else 
-                return std::string(buffer) + PATH_SLASH + _dir + _fname + "." + _ext;
+                return std::string(buffer) + PATH_SLASH + n_dir + _fname + "." + _ext;
 
         }
         else {
-            return _dir + PATH_SLASH + _fname + "." + _ext;
+            return n_dir + PATH_SLASH + _fname + "." + _ext;
         }
         
     };
