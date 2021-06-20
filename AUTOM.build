@@ -6,7 +6,8 @@ main_srcs = [
     "./src/json.cpp",
     "./src/fs.cpp",
     "./src/crt.c",
-    "./src/utils.cpp"
+    "./src/utils.cpp",
+    "./src/xml.cpp"
 ]
 
 if is_mac:
