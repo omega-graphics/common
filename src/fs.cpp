@@ -18,6 +18,7 @@
     void Path::parse(const String & str){
 
         _str = str;
+        std::istringstream is(_str);
 
         Vector<Token> tokens;
 
@@ -29,12 +30,17 @@
         char *buffer_ptr = buffer;
         char *buf_start = buffer_ptr;
         
-        auto get_char = [&](){
-            return str[idx];
+        auto get_char = [&]() -> char{
+            return is.get();
         };
         
-        auto ahead_char = [&](){
-            return str[idx + 1];
+        auto ahead_char = [&]() -> char{
+            char ch = is.get();
+            is.seekg(-1,std::ios::cur);
+            if(ch == -1){
+                return '\0';
+            };
+            return ch;
         };
         
         auto clear_buffer = [&](Token::Type ty){
@@ -50,13 +56,12 @@
         char c;
         /// A Boolean to decide whether to continue!
         bool cont = true;
-        while(idx != str.size()){
-            c = get_char();
+        while((c = get_char()) != -1){
             switch (c) {
-                // case '\0' : {
-                //     cont = false;
-                //     break;
-                // }
+                case '\0' : {
+                    cont = false;
+                    break;
+                }
                 case '/' : {
                     *buffer_ptr = c;
                     ++buffer_ptr;

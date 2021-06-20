@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <cstring>
+#include <typeinfo>
+#include <memory>
 
 
 #ifndef OMEGA_COMMON_COMMON_UTILS_H
@@ -308,6 +310,151 @@ namespace OmegaCommon {
     MapRef<K,V> operator&(Map<K,V> & other){
         return other;
     };
+
+    // template<class T>
+    // class ArcPtr {
+    //     struct _ptr_data {
+    //         T *data;
+    //         unsigned ref_count;
+    //     };
+    //     _ptr_data * _data;
+    // private:
+    //     ArcPtr(_ptr_data *data):_data(data){
+    //         _data->ref_count += 1;
+    //     };
+    // public:
+    //     _ptr_data * _get_data() const{
+    //         return _data;
+    //     };
+    // public:
+    //     T & operator*() throw(){
+    //         return *_data->data;
+    //     };
+    //     auto operator->(){
+    //         return _data->data;
+    //     };
+
+    //     operator bool() const{
+    //         return _data != nullptr;
+    //     };
+
+    //     // template<class _nTy>
+    //     // ArcPtr<_nTy> castAs(){
+    //     //     if(typeid(_nTy) == _data->t)
+    //     //         return *this;
+    //     //     else  
+    //     //         return nullptr;
+    //     // };
+
+    //     template<class _nTy,std::enable_if_t<std::is_base_of_v<T,_nTy>,int> = 0>
+    //     ArcPtr<_nTy> downcastAs(){
+    //         if(!_data){
+    //             return nullptr;
+    //         };
+    //         return *this;
+    //     };
+
+    //     template<class _nTy,std::enable_if_t<std::is_convertible_v<T,_nTy>,int> = 0>
+    //     ArcPtr<_nTy> castTo(){
+    //         if(!_data){
+    //             return nullptr;
+    //         };
+    //         return *this;
+    //     };
+        
+    //     ArcPtr():_data(nullptr){
+
+    //     };
+
+    //     ArcPtr(decltype(nullptr)):_data(nullptr){
+
+    //     };
+
+    //     ArcPtr(T * _ptr):_data(new _ptr_data()){
+    //         _data->data = _ptr;
+    //         _data->ref_count = 1;
+    //     };
+
+        
+    //     ArcPtr(const ArcPtr & other):_data((_ptr_data *)other._get_data()){
+    //         _data->ref_count += 1;
+    //     };
+
+      
+    //     ArcPtr(ArcPtr && other):_data((_ptr_data *)other._get_data()){
+    //         _data->ref_count += 1;
+    //     };
+
+    //     template<class _Ty,std::enable_if_t<std::is_base_of_v<_Ty,T>,int> = 0>
+    //     ArcPtr(const ArcPtr<_Ty> & other):_data((_ptr_data *)other._get_data()){
+    //         _data->ref_count += 1;
+    //     };
+
+    //     template<class _Ty,std::enable_if_t<std::is_base_of_v<_Ty,T>,int> = 0>
+    //     ArcPtr(ArcPtr<_Ty> && other):_data((_ptr_data *)other._get_data()){
+    //         _data->ref_count += 1;
+    //     };
+
+    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<_Ty,T>,int> = 0>
+    //     ArcPtr(const ArcPtr<_Ty> & other):_data((_ptr_data *)other._get_data()){
+    //         _data->ref_count += 1;
+    //     };
+
+    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<_Ty,T>,int> = 0>
+    //     ArcPtr(ArcPtr<_Ty> && other):_data((_ptr_data *)other._get_data()){
+    //         _data->ref_count += 1;
+    //     };
+
+
+
+    //     inline ArcPtr & operator=(ArcPtr && other){
+    //         _data = (_ptr_data *)other._get_data();
+    //         _data->ref_count += 1;
+    //         return *this;
+    //     };
+        
+    //     inline ArcPtr & operator=(const ArcPtr & other){
+    //         _data = (_ptr_data *)other._get_data();
+    //         _data->ref_count += 1;
+    //         return *this;
+    //     };
+
+    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<T,_Ty>,int> = 0>
+    //     inline ArcPtr<T> & operator=(const ArcPtr<_Ty> & other){
+    //         _data = (_ptr_data *)other._get_data();
+    //         _data->ref_count += 1;
+    //         return *this;
+    //     };
+
+    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<T,_Ty>,int> = 0>
+    //     inline ArcPtr<T> & operator=(ArcPtr<_Ty> && other){
+    //         _data = (_ptr_data *)other._get_data();
+    //         _data->ref_count += 1;
+    //         return *this;
+    //     };
+
+    //     ~ArcPtr(){
+    //         if(_data != nullptr){
+    //             _data->ref_count -= 1;
+    //             if(_data->ref_count == 0){
+    //                 delete _data->data;
+    //                 delete _data;
+    //             };
+    //         };
+    //     };
+    // };
+
+    // template<class T,class ..._Args>
+    // ArcPtr<T> make_arc(_Args && ...args){
+    //     return ArcPtr<T>(new T(args...));
+    // };
+
+    // ArcPtr<int> bitch = make_arc<int>(0);
+    
+    // void boo (){
+    //     auto test = bitch.castTo<float>();
+
+    // };
 
     typedef enum : int {
         Ok,

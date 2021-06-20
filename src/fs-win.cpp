@@ -76,6 +76,7 @@ namespace OmegaCommon::FS {
     };
 
     StatusCode changeCWD(Path newPath){
+        MessageBoxA(GetForegroundWindow(),newPath.absPath().c_str(),"NOTE",MB_OK);
         BOOL success = SetCurrentDirectoryA(newPath.absPath().c_str());
         if(success){
             return Ok;
