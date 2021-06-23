@@ -1,0 +1,11 @@
+#define TOK_ID 0x01
+#define TOK_KW 0x02
+
+
+#define TOK(content) content
+#define KW(name) TOK(name)
+
+#define KW_CLASS KW("class")
+#define KW_INTERFACE KW("interface")
+#define KW_FUNC KW("func")
+#define KW_NAMESPACE KW("namespace")
