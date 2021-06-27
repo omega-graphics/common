@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <cstring>
 #include <typeinfo>
 #include <memory>
@@ -147,9 +148,28 @@ namespace OmegaCommon {
             return const_iterator(_data + _len);
         }
 
-    private:
+        const_reference operator[](unsigned idx){
+            return begin()[idx];
+        };
 
+    private:
+        bool compare(StrRefBase & str){
+            if(str._len != str._len)
+                return false;
+            
+            for(unsigned i = 0;i < _len;i++){
+                auto & c = *(begin() + i);
+                if(c != str[i]){
+                    return false;
+                };
+            };
+            return true;
+        };
     public:
+
+        StrRefBase():_data(nullptr),_len(0){
+
+        };
 
         StrRefBase(std::basic_string<CharTY> & strty):_data(strty.data()),_len(strty.size()){
 
@@ -158,6 +178,24 @@ namespace OmegaCommon {
         StrRefBase(CharTY *buffer,size_type length):_data(buffer),_len(length){
 
         }
+
+        StrRefBase(const CharTY *c_str):_data(const_cast<char *>(c_str)),_len(strlen(c_str)){
+
+        }
+
+        bool operator==(std::basic_string<CharTY> & str){
+            StrRefBase ref(str);
+            return compare(ref);
+        };
+
+        bool operator==(StrRefBase &str){
+            return compare(str);
+        };
+
+        bool operator==(const CharTY *str){
+            StrRefBase ref(str);
+            return compare(ref);
+        };
     };
 
     typedef StrRefBase<char> TStrRef;
@@ -269,8 +307,11 @@ namespace OmegaCommon {
     template<class K,class V>
     using Map = std::map<K,V>;
 
+    template<class K,class V>
+    using MapVec = std::unordered_map<K,V>;
+
     /** 
-      An immutable reference to an Map
+      An immutable reference to an Map or an MapVector
     */
     template<class K,class V>
     class MapRef : public ContainerRefBase<std::pair<K,V>>{
@@ -301,6 +342,10 @@ namespace OmegaCommon {
 
         };
 
+        MapRef(MapVec<K,V> & map):ContainerRefBase<std::pair<K,V>>(map.begin(),map.end()){
+
+        };
+
         operator Map<K,V>(){
             return {this->begin(),this->end()};
         };
@@ -308,6 +353,11 @@ namespace OmegaCommon {
 
     template<class K,class V>
     MapRef<K,V> operator&(Map<K,V> & other){
+        return other;
+    };
+
+    template<class K,class V>
+    MapRef<K,V> operator&(MapVec<K,V> & other){
         return other;
     };
 

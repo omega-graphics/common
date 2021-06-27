@@ -1,5 +1,32 @@
 
+ref "./myHeader.h"
 
+
+/// Builitin Data Types
+
+/// void 
+/// int 
+/// float
+/// double
+/// long
+/// char
+/// --> ADT <--
+/// string 
+/// vector
+/// map 
+
+
+
+
+interface AnotherClass {
+    
+};
+
+
+class MyClass {
+    func myMethod(param:string &,hello:AnotherClass) void
+    func otherMethod() string
+}
 
 
 

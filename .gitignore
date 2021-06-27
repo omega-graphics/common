@@ -2,7 +2,7 @@
 *.d
 gn-utils
 *.gn
-CMakeLists.txt
+# CMakeLists.txt
 *.cmake
 out
 compile_commands.json
