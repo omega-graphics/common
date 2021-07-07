@@ -25,7 +25,6 @@ set_property("omega-common","frameworks",["Foundation.framework"])
 
 wrap_gen_srcs = glob("./wrapgen/*.cpp") + glob("./wrapgen/*.h")
 Executable("omega-wrapgen",wrap_gen_srcs,["omega-common"],"bin")
-set_property("omega-wrapgen","configs",["omega-common_conf"])
 
 # project.add_targets([main])
 # project.install_targets("omega_common_lib",[main],"lib")

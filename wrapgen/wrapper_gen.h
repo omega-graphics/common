@@ -17,7 +17,7 @@ namespace OmegaWrapGen {
         virtual void genDecl(DeclNode *node) = 0;
     public:
         virtual void setContext(GenContext & ctxt) = 0;
-        virtual GenContext & getContext();
+        virtual GenContext & getContext() = 0;
         virtual void finish() = 0;
 
         static Gen *CreateCGen();

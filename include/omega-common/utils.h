@@ -283,6 +283,10 @@ namespace OmegaCommon {
             assert(idx < this->size() && "Index must be smaller than the size of the ArrayRef");
             return this->begin()[idx];
         };
+        template<class __It>
+        ArrayRef(__It beg,__It end):ContainerRefBase<T>(beg,end){
+            
+        };
         
 
         ArrayRef(Vector<T> & vec):ContainerRefBase<T>(vec.begin(),vec.end()){

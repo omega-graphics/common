@@ -35,6 +35,36 @@ namespace OmegaCommon::FS {
         return fileType == NSFileTypeSymbolicLink;
     };
 
+    bool Path::exists(){
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        BOOL rc = [fileManager fileExistsAtPath:[[NSString alloc] initWithUTF8String:absPath().c_str()]];
+        return rc == YES;
+    };
+
+
+    String Path::absPath(){
+        auto n_dir = _dir;
+        // for(auto & c : n_dir){
+        //     if(c == '/')
+        //         c = PATH_SLASH;
+        // };
+
+        if(isRelative){
+            NSString *currentDir = [[NSFileManager defaultManager] currentDirectoryPath];
+            const char *buffer = currentDir.UTF8String;
+            if(_dir.front() == '.')
+                return buffer + n_dir.substr(1,n_dir.size()-1) + PATH_SLASH + _fname + "." + _ext;
+            else 
+                return std::string(buffer) + PATH_SLASH + n_dir + _fname + "." + _ext;
+
+        }
+        else {
+            return n_dir + PATH_SLASH + _fname + "." + _ext;
+        }
+        
+    };
+
+
     StatusCode changeCWD(Path newPath){
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSURL *fileUrl = [NSURL fileURLWithFileSystemRepresentation:newPath.str().c_str() isDirectory:YES relativeToURL:nil];
