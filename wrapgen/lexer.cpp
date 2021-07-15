@@ -3,8 +3,30 @@
 
 namespace OmegaWrapGen {
 
-    bool isKeyword(std::string_view v){
-        return (v == KW_CLASS) || (v == KW_FUNC);
+    struct LexerError : public Diagnostic {
+        OmegaCommon::String message;
+        LexerError(OmegaCommon::TStrRef _message):message(_message){
+
+        };
+        bool isError() override{
+            return true;
+        };
+        void format(std::ostream &out) override{
+            out << "ERROR:" << message.data() << std::endl;
+        };
+    };
+
+    Lexer::Lexer(DiagnosticBuffer & stream):stream(stream){
+
+    };
+
+    bool isKeyword(OmegaCommon::TStrRef v){
+        return 
+        (v == KW_CLASS) || 
+        (v == KW_FUNC) || 
+        (v == KW_CONST) || 
+        (v == KW_INTERFACE) || 
+        (v == KW_NAMESPACE);
     };
 
     void Lexer::setInputStream(std::istream *is){
@@ -42,7 +64,19 @@ namespace OmegaWrapGen {
         char c;
         while((c = getChar()) != -1){
             switch (c) {
-            default : {
+                case '/': {
+                    PUSH_CHAR(c)
+                    c = aheadChar();
+                    if(c == '/'){
+                        while((c = getChar()) != '\n')
+                            PUSH_CHAR(c)
+                        PUSH_TOK(TOK_LINECOMMENT)
+                    }
+                    else {
+                       stream.push(new LexerError("Unexpected Token"));
+                    };
+                    break;
+                }
                 case '{' : {
                     PUSH_CHAR(c)
                     PUSH_TOK(TOK_LBRACE)
@@ -58,6 +92,11 @@ namespace OmegaWrapGen {
                     PUSH_TOK(TOK_ASTERISK)
                     break;
                 }
+                case ',' : {
+                    PUSH_CHAR(c)
+                    PUSH_TOK(TOK_COMMA)
+                    break;
+                }
                 case '&' : {
                     PUSH_CHAR(c)
                     PUSH_TOK(TOK_AMP)
@@ -69,14 +108,16 @@ namespace OmegaWrapGen {
                     PUSH_TOK(TOK_STRLITERAL)
                     break;
                 }
-                if(std::isalnum(c)){
-                    PUSH_CHAR(c);
-                    if(!std::isalnum(c)){
-                        PUSH_TOK(TOK_ID)
+                default : {
+                    if(std::isalnum(c)){
+                        PUSH_CHAR(c);
+                        c = aheadChar();
+                        if(!std::isalnum(c)){
+                            PUSH_TOK(TOK_ID)
+                        };
                     };
-                };
-                break;
-            }
+                    break;
+                }
             }
         };
 

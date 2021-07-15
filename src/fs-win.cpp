@@ -2,6 +2,8 @@
 
 #include <windows.h>
 #include <ShlObj.h>
+#include <shlwapi.h>
+#include <PathCch.h>
 
 #pragma comment(lib,"user32.lib")
 
@@ -20,6 +22,10 @@ namespace OmegaCommon::FS {
     bool Path::isSymLink(){
         DWORD attrs = GetFileAttributes(str().c_str());
         return attrs & FILE_ATTRIBUTE_REPARSE_POINT;
+    };
+
+    bool Path::exists(){
+        return PathFileExistsA(str().c_str());
     };
 
     String Path::absPath(){

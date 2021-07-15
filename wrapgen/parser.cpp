@@ -206,6 +206,7 @@ namespace OmegaWrapGen {
                 break;
             }
         }
+        return true;
     };
 
 

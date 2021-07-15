@@ -14,6 +14,8 @@ typedef int TokTy;
 #define TOK_RPAREN 0x0A
 #define TOK_COMMA 0x0B
 #define TOK_COLON 0x0C
+#define TOK_LINECOMMENT 0x0D
+#define TOK_BLOCKCOMMENT 0x0E
 #define TOK_EOF 0xFF
 
 

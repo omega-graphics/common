@@ -196,6 +196,11 @@ namespace OmegaCommon {
             StrRefBase ref(str);
             return compare(ref);
         };
+
+        operator std::basic_string<CharTY>(){
+            return {this->begin(),this->end()};
+        };
+
     };
 
     typedef StrRefBase<char> TStrRef;
@@ -503,17 +508,12 @@ namespace OmegaCommon {
     //     return ArcPtr<T>(new T(args...));
     // };
 
-    // ArcPtr<int> bitch = make_arc<int>(0);
-    
-    // void boo (){
-    //     auto test = bitch.castTo<float>();
-
-    // };
 
     typedef enum : int {
         Ok,
         Failed
     } StatusCode;
+
     
 };
 

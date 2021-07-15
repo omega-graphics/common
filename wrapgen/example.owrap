@@ -2,18 +2,18 @@
 ref "./myHeader.h"
 
 
-/// Builitin Data Types
+// Builitin Data Types
 
-/// void 
-/// int 
-/// float
-/// double
-/// long
-/// char
-/// --> ADT <--
-/// string 
-/// vector
-/// map 
+// void 
+// int 
+// float
+// double
+// long
+// char
+// --> ADT <--
+// string 
+// vector
+// map 
 
 
 

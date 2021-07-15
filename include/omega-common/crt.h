@@ -13,7 +13,7 @@ typedef int64_t OmegaObjectType;
 typedef const char * OmegaCString;
 
 
-typedef enum : int {
+typedef enum {
     FALSE = 0x00,
     TRUE = 0x01,
 } OmegaCommonBool;
