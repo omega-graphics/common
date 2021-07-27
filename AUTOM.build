@@ -21,6 +21,8 @@ StaticLibrary("omega-common",main_srcs,[],"lib")
 set_property("omega-common","configs",["omega-common_conf"])
 set_property("omega-common","frameworks",["Foundation.framework"])
 
+Executable("omega-ebin",["./embedbin/embedbin.cpp"],["omega-common"],"bin")
+Executable("ebin-test",["./embedbin/tests/hello.cpp","./embedbin/tests/msg.c"],["omega-common"],"tests")
 
 
 wrap_gen_srcs = glob("./wrapgen/*.cpp") + glob("./wrapgen/*.h")
