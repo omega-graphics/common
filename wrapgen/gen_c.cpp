@@ -5,7 +5,13 @@ namespace OmegaWrapGen {
 
     class CGen final : public Gen {
         GenContext *ctxt;
-    
+
+        CGenSettings & settings;
+    public:
+
+        CGen(CGenSettings & settings):settings(settings){
+
+        };
 
         void setContext(GenContext &ctxt) override {
             this->ctxt = &ctxt;
@@ -16,8 +22,7 @@ namespace OmegaWrapGen {
         };
 
 
-
-        void genDecl(DeclNode *node) override {
+        void consumeDecl(DeclNode *node) override {
 
         };
 
@@ -28,7 +33,7 @@ namespace OmegaWrapGen {
 
     };
 
-    Gen *Gen::CreateCGen(){
-        return new CGen();
+    Gen *Gen::CreateCGen(CGenSettings & settings){
+        return new CGen(settings);
     };
 };

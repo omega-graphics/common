@@ -31,7 +31,13 @@ namespace OmegaWrapGen {
     class Type {
         OmegaCommon::String name;
     public:
-        static Type * Create(OmegaCommon::TStrRef name);
+        bool isConst;
+
+        bool isPointer;
+
+        bool isReference;
+
+        static Type * Create(OmegaCommon::TStrRef name,bool isConst = false,bool isPointer = false,bool isReference = false);
         OmegaCommon::TStrRef getName();
     };
 
@@ -52,6 +58,11 @@ namespace OmegaWrapGen {
         _STANDARD_TYPE(MAP);
     };
 
+    struct NamespaceDeclNode : public DeclNode {
+        OmegaCommon::String name;
+        OmegaCommon::Vector<DeclNode *> body;
+    };
+
     struct FuncDeclNode : public DeclNode {
         OmegaCommon::String name;
         bool isStatic = false;
@@ -68,6 +79,19 @@ namespace OmegaWrapGen {
     struct InterfaceDeclNode : public DeclNode {
         OmegaCommon::String name;
         OmegaCommon::Vector<FuncDeclNode *> instMethods;
+    };
+
+    class TreeConsumer {
+    public:
+        virtual void consumeDecl(DeclNode *node) = 0;
+    };
+
+    class TreeDumper : public TreeConsumer {
+        std::ostream & out;
+    public:
+        void writeDecl(DeclNode *node,unsigned level);
+        void consumeDecl(DeclNode *node) override;
+        TreeDumper(std::ostream & out);
     };
 
 };

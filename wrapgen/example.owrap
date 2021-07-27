@@ -1,5 +1,4 @@
-
-ref "./myHeader.h"
+// ref "./myHeader.h"
 
 
 // Builitin Data Types
@@ -18,14 +17,10 @@ ref "./myHeader.h"
 
 
 
-interface AnotherClass {
-    
-};
+namespace MyNamespace {
 
+   func myFunc() void
 
-class MyClass {
-    func myMethod(param:string &,hello:AnotherClass) void
-    func otherMethod() string
 }
 
 

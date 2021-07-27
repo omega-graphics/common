@@ -48,8 +48,10 @@ int main(int argc,char *argv[]){
     std::string output_dir = "./dist";
     OmegaWrapGen::GenContext gen_ctxt;
     gen_ctxt.output_dir = output_dir;
+
+    OmegaWrapGen::CGenSettings settings {""};
     
-    auto generator = OmegaWrapGen::Gen::CreateCGen();
+    auto generator = OmegaWrapGen::Gen::CreateCGen(settings);
     generator->setContext(gen_ctxt);
 
     OmegaWrapGen::Parser parser(generator);

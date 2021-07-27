@@ -11,16 +11,20 @@ namespace OmegaWrapGen {
         OmegaCommon::TStrRef output_dir;
     };
 
+    struct CGenSettings {
+        OmegaCommon::TStrRef headerName;
+    };
 
-    class Gen {
+
+    class Gen : public TreeConsumer {
         friend class Parser;
-        virtual void genDecl(DeclNode *node) = 0;
     public:
+        using TreeConsumer::consumeDecl;
         virtual void setContext(GenContext & ctxt) = 0;
         virtual GenContext & getContext() = 0;
         virtual void finish() = 0;
 
-        static Gen *CreateCGen();
+        static Gen *CreateCGen(CGenSettings & settings);
     };
 
 };

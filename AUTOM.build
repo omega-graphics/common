@@ -27,6 +27,7 @@ wrap_gen_srcs = glob("./wrapgen/*.cpp") + glob("./wrapgen/*.h")
 StaticLibrary("owrapgen",wrap_gen_srcs,["omega-common"],"lib")
 Executable("omega-wrapgen",["./wrapgen/main/main.cpp"],["owrapgen"],"bin")
 Executable("owrap-lex-test",["./wrapgen/tests/lex-test.cpp"],["owrapgen"],"tests")
+Executable("owrap-parse-test",["./wrapgen/tests/parse-test.cpp"],["owrapgen"],"tests")
 
 # project.add_targets([main])
 # project.install_targets("omega_common_lib",[main],"lib")
