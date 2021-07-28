@@ -12,9 +12,9 @@ namespace OmegaWrapGen {
 
 
     class Parser final {
+        std::unique_ptr<DiagnosticBuffer> errStream;
         std::unique_ptr<Lexer> lexer;
         Gen * gen;
-        std::unique_ptr<DiagnosticBuffer> errStream;
         DeclNode *nextDecl();
     public:
         Parser(Gen * gen);
