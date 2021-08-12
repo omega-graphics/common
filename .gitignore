@@ -3,7 +3,7 @@
 gn-utils
 *.gn
 # CMakeLists.txt
-*.cmake
+cmake
 out
 compile_commands.json
 .cache
