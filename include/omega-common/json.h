@@ -75,8 +75,8 @@ namespace OmegaCommon {
     std::istream & operator>>(std::istream & in,JSON & json);
     std::ostream & operator<<(std::ostream & out,JSON & json);
 
-    #define JSON_MAP Map<String,JSON>
-    #define JSON_ARRAY Vector<JSON>
+    typedef Map<String,JSON> JSONMap;
+    typedef Vector<JSON> JSONArray;
 
     struct JSONConvertible {
         virtual void toJSON(JSON & j) = 0;

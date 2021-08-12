@@ -238,8 +238,8 @@ namespace OmegaCommon {
     protected:
         size_type _size;
     public:
-        using const_iterator = const T *;
-        using const_reference = const T &;
+        typedef const T * const_iterator;
+        typedef const T & const_reference;
 
         bool empty() noexcept{
             return _size == 0;
@@ -319,19 +319,21 @@ namespace OmegaCommon {
     template<class K,class V>
     using MapVec = std::unordered_map<K,V>;
 
+
+
     /** 
       An immutable reference to an Map or an MapVector
     */
     template<class K,class V>
     class MapRef : public ContainerRefBase<std::pair<K,V>>{
-        using super = ContainerRefBase<std::pair<K,V>>;
+        typedef ContainerRefBase<std::pair<K,V>> super;
     public:
-        typedef typename super::size_type size_type;
-        typedef typename super::const_iterator const_iterator;
-        typedef typename super::const_reference const_reference;
+        using typename super::size_type;
+        using typename super::const_reference;
+        using typename super::const_iterator;
 
-        typedef std::add_lvalue_reference<std::add_const<typename const_reference::first_type>> const_key_ref;
-        typedef std::add_lvalue_reference<std::add_const<typename const_reference::second_type>> const_val_ref;
+        typedef const K & const_key_ref;
+        typedef const V & const_val_ref;
         
         const_iterator find(const_key_ref key){
             auto it = this->begin();
@@ -513,6 +515,7 @@ namespace OmegaCommon {
         Ok,
         Failed
     } StatusCode;
+
 
     
 };

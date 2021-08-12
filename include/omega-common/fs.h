@@ -130,6 +130,7 @@ namespace OmegaCommon {
             explicit DirectoryIterator(Path path);
             Path operator*();
             SELF & operator++();
+            ~DirectoryIterator();
         };
     };
 };

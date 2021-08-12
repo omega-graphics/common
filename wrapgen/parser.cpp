@@ -10,6 +10,7 @@ namespace OmegaWrapGen {
         DiagnosticBuffer & errStream;
         Type *buildType(Tok & first_tok);
         DeclNode *buildDecl(Tok & first_tok,TreeScope *parentScope);
+        Tok nextTok();
     public:
         Tok currentTok;
 
@@ -45,13 +46,45 @@ namespace OmegaWrapGen {
     #define EXPECTED_RPAREN() PARSER_ERROR_PUSH("Expected RParen") ERROR_RETURN
     #define EXPECTED_COLON() PARSER_ERROR_PUSH("Expected Colon") ERROR_RETURN
 
+    #define EXPECTED_KW_EXACT(name) PARSER_ERROR_PUSH("Expected Keyword :" name) ERROR_RETURN
 
 
     Type *TreeBuilder::buildType(Tok & first_tok){
+        bool isConst = false,isReference = false,isPointer = false;
+        if(first_tok.type == TOK_KW){
+            if(first_tok.content == KW_CONST){
+                isConst = true;
+            }
+            else {
+                EXPECTED_KW_EXACT("const");
+            }
+            first_tok = nextTok();
+        }
+
         if(first_tok.type != TOK_ID){
             EXPECTED_ID();
         };
-        auto t = Type::Create(first_tok.content);
+
+        OmegaCommon::String type_name = first_tok.content;
+
+        first_tok = nextTok();
+        if(first_tok.type == TOK_ASTERISK){
+            isPointer = true;
+        }
+        else if(first_tok.type == TOK_AMP){
+            isReference = true;
+        }
+        
+
+        auto t = Type::Create(type_name,isConst,isPointer,isReference);
+        return t;
+    };
+
+    Tok TreeBuilder::nextTok(){
+        auto t = lexer->nextTok();
+        while(t.type == TOK_LINECOMMENT){
+            t = lexer->nextTok();
+        };
         return t;
     };
 
@@ -61,21 +94,24 @@ namespace OmegaWrapGen {
             if(first_tok.content == KW_CLASS){
                 ClassDeclNode *class_node = new ClassDeclNode();
                 class_node->type = CLASS_DECL;
-                first_tok = lexer->nextTok();
+                first_tok = nextTok();
                 if(first_tok.type != TOK_ID){
                     EXPECTED_ID();
                 };
                 class_node->name = first_tok.content;
-                first_tok = lexer->nextTok();
+                first_tok = nextTok();
 
                 if(first_tok.type != TOK_LBRACE){
                     EXPECTED_LBRACE();
                 };
 
-                first_tok = lexer->nextTok();
+                first_tok = nextTok();
+                auto class_scope = new TreeScope {TreeScope::Class,class_node->name,parentScope};
                 while(first_tok.type != TOK_RBRACE){
-                    auto class_scope = new TreeScope {TreeScope::Class,class_node->name,parentScope};
                     auto child_node = buildDecl(first_tok,class_scope);
+                    if(!child_node){
+                        ERROR_RETURN;
+                    };
                     if(child_node->type == FUNC_DECL){
                         FuncDeclNode *f = (FuncDeclNode *)child_node;
                         if(f->isStatic)
@@ -83,7 +119,7 @@ namespace OmegaWrapGen {
                         else 
                             class_node->instMethods.push_back(f);
                     };
-                    first_tok = lexer->nextTok();
+                    first_tok = nextTok();
                 };
                 node = class_node;
             }
@@ -91,29 +127,29 @@ namespace OmegaWrapGen {
                 FuncDeclNode *func_decl = new FuncDeclNode();
                 func_decl->type = FUNC_DECL;
 
-                first_tok = lexer->nextTok();
+                first_tok = nextTok();
                 if(first_tok.type != TOK_ID){
                     EXPECTED_ID();
                 };
                 func_decl->name = first_tok.content;
-                first_tok = lexer->nextTok();
+                first_tok = nextTok();
                 if(first_tok.type != TOK_LPAREN){
                     EXPECTED_LPAREN();
                 };
-                first_tok = lexer->nextTok();
+                first_tok = nextTok();
                 while(first_tok.type != TOK_RPAREN){
 
                     if(first_tok.type != TOK_ID){
                         EXPECTED_ID();
                     };
                     OmegaCommon::String name = first_tok.content;
-                    first_tok = lexer->nextTok();
+                    first_tok = nextTok();
 
                     if(first_tok.type != TOK_COLON){
                         EXPECTED_COLON();
                     };
 
-                    first_tok = lexer->nextTok();
+                    first_tok = nextTok();
                     auto _arg_ty = buildType(first_tok);
 
                     if(!_arg_ty)
@@ -122,7 +158,7 @@ namespace OmegaWrapGen {
                     func_decl->params.insert(std::make_pair(name,_arg_ty));
                 };
 
-                first_tok = lexer->nextTok();
+                first_tok = nextTok();
                 auto _ty = buildType(first_tok);
                 if(!_ty){
                     ERROR_RETURN;
@@ -130,6 +166,34 @@ namespace OmegaWrapGen {
                 func_decl->returnType = _ty;
 
                 node = func_decl;
+            }
+            else if(first_tok.content == KW_NAMESPACE){
+                auto namespace_decl = new NamespaceDeclNode();
+                namespace_decl->type = NAMESPACE_DECL;
+
+                first_tok = nextTok();
+
+                if(first_tok.type != TOK_ID){
+                    EXPECTED_ID();
+                };
+                namespace_decl->name = first_tok.content;
+                first_tok = nextTok();
+
+                if(first_tok.type != TOK_LBRACE){
+                    EXPECTED_LBRACE();
+                };
+
+                first_tok = nextTok();
+                auto namespace_scope = new TreeScope {TreeScope::Namespace,namespace_decl->name,parentScope};
+                while(first_tok.type != TOK_RBRACE){
+                    auto decl = buildDecl(first_tok,namespace_scope);
+                    if(!decl){
+                        ERROR_RETURN;
+                    };
+                    namespace_decl->body.push_back(decl);
+                    first_tok = nextTok();
+                }
+                node = namespace_decl;
             };
             node->scope = parentScope;
             return node;
@@ -143,7 +207,7 @@ namespace OmegaWrapGen {
     DeclNode * TreeBuilder::nextDecl(bool *hasErrored){
         *hasErrored = false;
 
-        currentTok = lexer->nextTok();
+        currentTok = nextTok();
         if(currentTok.type == TOK_EOF){
             return nullptr;
         };
@@ -221,11 +285,10 @@ namespace OmegaWrapGen {
 
 
 
-    Parser::Parser(Gen *gen):
-    gen(gen),
+    Parser::Parser(TreeConsumer *consumer):
+    consumer(consumer),
     errStream(std::make_unique<DiagnosticBuffer>()),
-    lexer(std::make_unique<Lexer>(*errStream))
-    {
+    lexer(std::make_unique<Lexer>(*errStream)){
 
         builder = std::make_unique<TreeBuilder>(lexer.get(),*errStream);
         semantics = std::make_unique<TreeSemantics>(*errStream);
@@ -239,13 +302,16 @@ namespace OmegaWrapGen {
         DeclNode *node;
         bool err = false;
         while(((node = builder->nextDecl(&err)) != nullptr) && (!err)){
-            gen->genDecl(node);
+            consumer->consumeDecl(node);
         };
-        gen->finish();
+        // gen->finish();
     };
 
     void Parser::finish(){
-
+        this->lexer->finish();
+        if(errStream->hasErrored()){
+            errStream->logAll();
+        };
     };
 
 };

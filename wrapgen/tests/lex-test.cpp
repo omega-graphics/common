@@ -13,9 +13,9 @@ int main(int argc,char *argv[]){
     DiagnosticBuffer buffer;
     Lexer lex(buffer);
     lex.setInputStream(&in);
-    Tok t;
+    Tok t = lex.nextTok();
     for(;t.type != TOK_EOF && !buffer.hasErrored();t = lex.nextTok()){
-        std::cout << "TOK: { '" << t.content << "' }\n" << std::endl;
+        std::cout << "TOK: { '" << t.content << "' T:" << std::hex << t.type << std::dec << "}\n" << std::endl;
     };
     if(buffer.hasErrored())
         buffer.logAll();

@@ -66,9 +66,7 @@ namespace OmegaCommon::FS {
 
 
     StatusCode changeCWD(Path newPath){
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSURL *fileUrl = [NSURL fileURLWithFileSystemRepresentation:newPath.str().c_str() isDirectory:YES relativeToURL:nil];
-        [fileManager changeCurrentDirectoryPath:fileUrl.absoluteString];
+        chdir(newPath.str().c_str());
         return Ok;
     };
 

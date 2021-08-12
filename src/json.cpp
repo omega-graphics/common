@@ -5,8 +5,6 @@
 #include <iostream>
 #include <cassert>
 
-#undef JSON_ARRAY 
-#undef JSON_MAP
 
 namespace OmegaCommon {
     

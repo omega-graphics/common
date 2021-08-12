@@ -1,11 +1,11 @@
 #include "omega-common/fs.h"
 
 #include <windows.h>
-#include <ShlObj.h>
 #include <shlwapi.h>
 #include <PathCch.h>
 
 #pragma comment(lib,"user32.lib")
+#pragma comment(lib,"shlwapi.lib")
 
 namespace OmegaCommon::FS {
 
@@ -114,4 +114,8 @@ namespace OmegaCommon::FS {
             _end = true;
         return *this;
     };
+
+    DirectoryIterator::~DirectoryIterator(){
+        FindClose(dirp);
+    }
 };
