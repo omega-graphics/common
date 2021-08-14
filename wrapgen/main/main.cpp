@@ -1,6 +1,7 @@
 #include "omega-common/common.h"
 #include "../parser.h"
 #include <iostream>
+#include <filesystem>
 
 void printHelp(){
     std::cout << 
@@ -27,16 +28,21 @@ void printHelp(){
 int main(int argc,char *argv[]){
     /// Omit First Arg in `argv`
     OmegaCommon::TStrRef src_file;
+    OmegaCommon::TStrRef output_dir;
     --argc;
     unsigned i = 1;
-    while(argc > 0){
+    while(argc > 1){
         OmegaCommon::TStrRef arg(argv[i]);
         if(arg == "--help" || arg == "-h"){
             printHelp();
         }
+        else if(arg == "-o"){
+            output_dir = argv[++i];
+        }
         ++i;
         --argc;
-        if(argc == 0){
+
+        if(argc == 1){
             src_file = argv[i-1];
         };
     };
@@ -45,11 +51,15 @@ int main(int argc,char *argv[]){
 
     std::ifstream in("./example.owrap");
 
-    std::string output_dir = "./dist";
+    if(!std::filesystem::exists(output_dir.data())){
+        std::filesystem::create_directory(output_dir.data());
+    }
+//    std::string output_dir = "./dist";
     OmegaWrapGen::GenContext gen_ctxt;
     gen_ctxt.output_dir = output_dir;
+    gen_ctxt.name = OmegaCommon::FS::Path(src_file).filename();
 
-    OmegaWrapGen::CGenSettings settings {""};
+    OmegaWrapGen::CGenSettings settings {OmegaWrapGen::CGenSettings::Retain};
     
     auto generator = OmegaWrapGen::Gen::CreateCGen(settings);
     generator->setContext(gen_ctxt);

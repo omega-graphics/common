@@ -58,6 +58,10 @@ namespace OmegaWrapGen {
         _STANDARD_TYPE(MAP);
     };
 
+    struct HeaderDeclNode : public DeclNode {
+        OmegaCommon::String name;
+    };
+
     struct NamespaceDeclNode : public DeclNode {
         OmegaCommon::String name;
         OmegaCommon::Vector<DeclNode *> body;

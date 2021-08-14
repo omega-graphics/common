@@ -48,14 +48,14 @@ namespace OmegaCommon {
             SELF & append(const char *str);
 
             /**
-             Appends a String to the end of the path.
+             @brief Appends a String to the end of the path.
              @param str 
              @returns Path
             */
             SELF & append(String & str);
 
             /**
-             Appends a TStrRef to the end of the path.
+             @brief Appends a TStrRef to the end of the path.
              @param str 
              @returns Path
             */
@@ -76,35 +76,40 @@ namespace OmegaCommon {
             String &str();
 
             /**
-             Retrieves the top directory part of the path (if it has one).
+             @brief Retrieves the top directory part of the path (if it has one).
              @returns String
             */
             String & dir();
 
             /**
-             Retrieves the filename part of the path (if it has one).
+             @brief Retrieves the filename part of the path (if it has one).
              @returns String
             */
             String & filename();
 
             /**
-             Retrieves the file extension of the path (if it has one).
+             @brief Retrieves the file extension of the path (if it has one).
              @returns String
             */
             String & ext();
 
             /**
-             Gets the absolute path of this path
+             @brief Gets the absolute path of this path
              @returns String
             */
             String absPath();
             bool exists();
             Path(const char * str);
             Path(const String & str);
+            Path(TStrRef & str);
             ~Path();
             bool isFile();
             bool isDirectory();
             bool isSymLink();
+        };
+
+        inline bool exists(Path path){
+            return path.exists();
         };
 
         StatusCode changeCWD(Path newPath);

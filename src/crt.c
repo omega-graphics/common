@@ -5,7 +5,6 @@
 
 
 
-
 struct __OmegaObject {
     OmegaObjectType  type;
     void *data;
@@ -18,8 +17,8 @@ OmegaRTObject * omega_common_alloc(void *data,size_t size){
     obj.data = malloc(size);
     obj.size = size;
 
-    memcpy_s(obj.data,obj.size,data,size);
-    memcpy_s(rc,sizeof(OmegaRTObject),&obj,sizeof(OmegaRTObject));
+    memcpy(obj.data,data,size);
+    memcpy(rc,&obj,sizeof(OmegaRTObject));
     return rc;
 };
 

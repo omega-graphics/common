@@ -20,7 +20,7 @@ namespace OmegaCommon {
         static void __serialize(XML &xml,std::ostream & out);
     public:
         String & getName();
-        String & getProp(String & propName);
+        String & getProp(const String & propName);
         Vector<XML> & getChildren();
 
         static XML parse(String str);

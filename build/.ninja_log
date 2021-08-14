@@ -1,0 +1,25 @@
+# ninja log v5
+4	940	1628799805675788051	CMakeFiles/omega-wrapgen.dir/wrapgen/gen_c.cpp.o	dbed1f613260102b
+6	1115	1628799805855066252	CMakeFiles/omega-wrapgen.dir/wrapgen/main/main.cpp.o	4ad42728226fd999
+1057	1126	1628799805882925330	CMakeFiles/OmegaCommon.dir/src/net-curl.cpp.o	30d04d2d7e8d15
+8	926	1628799805658955996	CMakeFiles/OmegaCommon.dir/src/format.cpp.o	50d5a1fd6fe8129b
+0	1036	1628799805755154835	CMakeFiles/omega-wrapgen.dir/wrapgen/ast.cpp.o	7e274f7f55eb3a4d
+940	1550	1628799806310554949	CMakeFiles/OmegaCommon.dir/src/xml.cpp.o	12d2d696bbfea09e
+101	157	1628800634366111188	bin/omega-ebin	a101b902a5f2c286
+8	314	1628799805071018354	CMakeFiles/OmegaCommon.dir/src/crt.c.o	b492b4fe09cbdb2d
+1	1057	1628799805767516606	CMakeFiles/omega-wrapgen.dir/wrapgen/diagnostics.cpp.o	96ea3b043169c94e
+5	1109	1628799805851653549	CMakeFiles/omega-wrapgen.dir/wrapgen/lexer.cpp.o	128a856d4803ee63
+1036	2120	1628799806875858754	CMakeFiles/OmegaCommon.dir/src/fs-cocoa.mm.o	e559fabb3dbc6db9
+17	70	1628809238517439033	Frameworks/OmegaCommon.framework/Versions/0.5/Resources/Info.plist	b8ff33bf47ac7b6d
+6	1125	1628799805879890918	CMakeFiles/omega-wrapgen.dir/wrapgen/parser.cpp.o	593b28c0e1e72bca
+9	1123	1628799805871419891	CMakeFiles/OmegaCommon.dir/src/json.cpp.o	1aeab3d964633954
+15	113	1628809238560182233	Frameworks/OmegaCommon.framework/Versions/0.5/OmegaCommon	6ba8ffe4f11f4e3c
+927	1559	1628799806316818105	CMakeFiles/OmegaCommon.dir/src/utils.cpp.o	5dadc1f77ba3bc47
+36	325	1628809397973078990	Frameworks/OmegaCommon.framework/Versions/0.5/_CodeSignature	597e91945058ea55
+322	1308	1628799806064497818	CMakeFiles/OmegaCommon.dir/src/fs.cpp.o	2b8e5cc4a5648faa
+101	160	1628800634369312016	bin/omega-wrapgen	2edb035e4ae4e613
+4	238	1628809455139548675	build.ninja	700dddb32d7189b0
+7	1099	1628799805801467008	CMakeFiles/omega-ebin.dir/embedbin/embedbin.cpp.o	bd399c5125ec803
+36	202	1628809015354456906	CMakeFiles/OmegaCommon.dir/src/multithread-unix.cpp.o	c40d88be3cd3d5db
+3	202	1628809455139548675	build.ninja	700dddb32d7189b0
+7	244	1628809455399238413	Frameworks/OmegaCommon.framework/Versions/0.5/_CodeSignature	8cc43f3293f8db3f

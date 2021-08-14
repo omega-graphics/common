@@ -30,8 +30,8 @@
         char *buffer_ptr = buffer;
         char *buf_start = buffer_ptr;
         
-        auto get_char = [&]() -> char{
-            return is.get();
+        auto get_char = [&](){
+            return (char)is.get();
         };
         
         auto ahead_char = [&]() -> char{
@@ -50,7 +50,7 @@
         };
         
         auto isAlnumAndOther = [&](char c){
-            return isalnum(c) ||  (c == '-') || (c == '_');
+            return isalnum(c) ||  (c == '-') || (c == '_') || (c == ' ');
         };
         
         char c;
@@ -58,10 +58,10 @@
         bool cont = true;
         while((c = get_char()) != -1){
             switch (c) {
-                case '\0' : {
-                    cont = false;
-                    break;
-                }
+//                case '\0' : {
+//                    cont = false;
+//                    break;
+//                }
                 case '/' : {
                     *buffer_ptr = c;
                     ++buffer_ptr;
@@ -80,9 +80,11 @@
                     clear_buffer(Token::Dot);
                     break;
                 }
-                case ' ' : {
-                    break;
-                }
+//                case ' ' : {
+//                    *buffer_ptr = c;
+//                    ++buffer_ptr;
+//                    break;
+//                }
                 default : {
                     if(isAlnumAndOther(c)){
                         *buffer_ptr = c;
@@ -161,6 +163,10 @@
 
     Path::Path(const char *str){
         parse(str);
+    };
+
+    Path::Path(TStrRef & str){
+        parse(str.data());
     };
 
     Path::Path(const String & str){

@@ -6,6 +6,12 @@
 #include "utils.h"
 #ifdef _WIN32
 #include <Windows.h>
+#elif defined(__APPLE__)
+
+#include <dispatch/dispatch.h>
+
+#else
+#include <semaphore.h>
 #endif
 #include <mutex>
 #include <thread>
@@ -18,8 +24,10 @@ namespace OmegaCommon {
     class Semaphore {
         #ifdef _WIN32
         HANDLE sem;
-        #else 
-        semaphore_t *sem;
+        #elif defined(__APPLE__)
+        dispatch_semaphore_t sem;
+        #else
+        sem_t * sem;
         #endif
     public:
         Semaphore(int initialValue);

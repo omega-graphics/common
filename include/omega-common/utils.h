@@ -154,7 +154,7 @@ namespace OmegaCommon {
 
     private:
         bool compare(StrRefBase & str){
-            if(str._len != str._len)
+            if(_len != str._len)
                 return false;
             
             for(unsigned i = 0;i < _len;i++){
@@ -219,6 +219,7 @@ namespace OmegaCommon {
     TStrRef operator&(String & str);
     WStrRef operator&(WString & str);
     UStrRef operator&(UString & str);
+
 
     template<class T>
     using Vector = std::vector<T>;
@@ -298,7 +299,7 @@ namespace OmegaCommon {
             
         };
 
-        template<unsigned len>
+        template<size_t len>
         ArrayRef(Array<T,len> & array):ContainerRefBase<T>(array.data(),len){
             
         };
@@ -519,5 +520,17 @@ namespace OmegaCommon {
 
     
 };
+
+inline std::ostream & operator<<(std::ostream &os,OmegaCommon::TStrRef &str){
+    return os << str.data();
+};
+
+inline std::wostream & operator<<(std::wostream &os,OmegaCommon::WStrRef &str){
+    return os << str.data();
+};
+
+//inline std::basic_ostream<char32_t> & operator<<(std::basic_ostream<char32_t> &os,OmegaCommon::UStrRef &str){
+//    return os << str.data();
+//};
 
 #endif

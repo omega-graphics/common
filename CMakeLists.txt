@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(OmegaCommon C CXX)
+set(OMEGACOMMON_VERSION "0.5")
+
+project(OmegaCommon VERSION ${OMEGACOMMON_VERSION} LANGUAGES C CXX)
 
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
@@ -9,16 +11,24 @@ include(OmegaGraphicsSuite)
 
 set(COMMON_SRCS "src/crt.c" "src/format.cpp" "src/json.cpp" "src/fs.cpp" "src/utils.cpp" "src/xml.cpp")
 
-add_omega_graphics_module("OmegaCommon" STATIC SOURCES ${COMMON_SRCS} HEADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+configure_file("src/Info.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
+
+
+add_omega_graphics_module("OmegaCommon" SHARED SOURCES ${COMMON_SRCS} HEADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 if(WIN32)
 	target_sources("OmegaCommon" PRIVATE "src/fs-win.cpp"  "src/net-win.cpp" "src/multithread-win.cpp")
 elseif(APPLE)
-	target_sources("OmegaCommon" PRIVATE "src/fs-cocoa.mm"  "src/net-curl.cpp")
+	target_sources("OmegaCommon" PRIVATE "src/fs-cocoa.mm"  "src/net-curl.cpp" "src/multithread-unix.cpp")
+	target_link_frameworks("OmegaCommon" "Foundation")
 endif()
 
 file(GLOB WRAPGEN_SRCS "wrapgen/*.cpp")
 
 add_omega_graphics_tool("omega-wrapgen" LIBS "OmegaCommon" SOURCES ${WRAPGEN_SRCS} "wrapgen/main/main.cpp")
+
+add_omega_graphics_tool("lex-test" LIBS "OmegaCommon" SOURCES ${WRAPGEN_SRCS} "wrapgen/tests/lex-test.cpp")
+
+add_omega_graphics_tool("parse-test" LIBS "OmegaCommon" SOURCES ${WRAPGEN_SRCS} "wrapgen/tests/parse-test.cpp")
 
 file(GLOB EBIN_SRCS "embedbin/*.cpp")
 

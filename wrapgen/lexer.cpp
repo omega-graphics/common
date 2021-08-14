@@ -36,8 +36,8 @@ namespace OmegaWrapGen {
 
     Tok Lexer::nextTok(){
 
-        auto getChar = [&]() -> char{
-            return is->get();
+        auto getChar = [&](){
+            return (char)is->get();
         };
 
         auto aheadChar = [&]() -> char {
@@ -107,6 +107,11 @@ namespace OmegaWrapGen {
                     PUSH_TOK(TOK_RPAREN)
                     break;
                 }
+                case ':' : {
+                    PUSH_CHAR(c)
+                    PUSH_TOK(TOK_COLON)
+                    break;
+                }
                 case '*' : {
                     PUSH_CHAR(c)
                     PUSH_TOK(TOK_ASTERISK)
@@ -123,8 +128,9 @@ namespace OmegaWrapGen {
                     break;
                 }
                 case '"' : {
-                    while((c = getChar()) != '"')
+                    while((c = getChar()) != '"') {
                         PUSH_CHAR(c)
+                    }
                     PUSH_TOK(TOK_STRLITERAL)
                     break;
                 }

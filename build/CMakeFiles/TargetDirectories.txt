@@ -1,0 +1,14 @@
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/install/strip.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/install.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/list_install_components.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/rebuild_cache.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/install/local.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/omega-wrapgen.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/OmegaCommon__framework_embed.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/OmegaCommon__res.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/OmegaCommon.framework.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/OmegaCommon.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/OmegaCommon__codesign.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/edit_cache.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/omega-ebin.dir
+/Users/alextopper/Documents/OmegaGraphics/wtk/gte/common/build/CMakeFiles/OmegaCommon__unsigned.dir

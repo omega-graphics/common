@@ -118,16 +118,19 @@ namespace OmegaCommon {
     class XMLParser {
         static std::unique_ptr<XMLLexer> lexer;
     public:
-        void setInputStream(std::istream * is);
-        XML parseToJSON(){
+        void setInputStream(std::istream * is){
+            lexer->setInputStream(is);
+        };
+        XML parseToXML(){
 
         };
         XML parse(){
-            return parseToJSON();
+            return parseToXML();
         };
     };
 
     std::unique_ptr<XMLLexer> XMLParser::lexer = std::make_unique<XMLLexer>();
+
 
     std::unique_ptr<XMLParser> XML::parser = std::make_unique<XMLParser>();
 };

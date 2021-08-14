@@ -3,7 +3,7 @@
 
 namespace OmegaWrapGen {
 
-    TreeScope *GLOBAL_SCOPE = new TreeScope {TreeScope::Namespace,"__GLOBAL__"};
+    TreeScope *GLOBAL_SCOPE = new TreeScope {TreeScope::Namespace,"__GLOBAL__",nullptr};
 
       namespace stdtypes {
 
@@ -79,7 +79,7 @@ namespace OmegaWrapGen {
                 "   name:" << func_node->name << "\n" << pad <<
                 "   params:{\n" << std::flush;
                 auto second_pad = padString(level + 1);
-                for(auto n : func_node->params){
+                for(const auto& n : func_node->params){
                     if(n.first != func_node->params.begin()->first) out << ",\n";
                     out << second_pad << "\"" << n.first << "\":" << ASTTypeToString(n.second) << std::flush;
                 };
@@ -130,6 +130,11 @@ namespace OmegaWrapGen {
                 out << 
                 pad << "   ]\n" << pad <<
                 "}" << std::endl;
+                break;
+            }
+            case HEADER_DECL : {
+                auto * decl_node = (HeaderDeclNode *)node;
+                out << pad << "HeaderDecl : {" << std::endl << pad << "   header:\"" << decl_node->name << "\"" << std::endl << pad << "}" << std::endl;
                 break;
             }
         }

@@ -1,5 +1,6 @@
 #include "parser.h"
 #include <memory>
+#include <iostream>
 
 namespace OmegaWrapGen {
 
@@ -45,12 +46,15 @@ namespace OmegaWrapGen {
     #define EXPECTED_LPAREN() PARSER_ERROR_PUSH("Expected LParen") ERROR_RETURN
     #define EXPECTED_RPAREN() PARSER_ERROR_PUSH("Expected RParen") ERROR_RETURN
     #define EXPECTED_COLON() PARSER_ERROR_PUSH("Expected Colon") ERROR_RETURN
+    #define EXPECTED_STR() PARSER_ERROR_PUSH("Expected String Literal") ERROR_RETURN
 
     #define EXPECTED_KW_EXACT(name) PARSER_ERROR_PUSH("Expected Keyword :" name) ERROR_RETURN
 
 
     Type *TreeBuilder::buildType(Tok & first_tok){
         bool isConst = false,isReference = false,isPointer = false;
+//        std::cout << "Type Tok 1:" << first_tok.type << first_tok.content << std::endl;
+
         if(first_tok.type == TOK_KW){
             if(first_tok.content == KW_CONST){
                 isConst = true;
@@ -66,6 +70,14 @@ namespace OmegaWrapGen {
         };
 
         OmegaCommon::String type_name = first_tok.content;
+
+        if(type_name == stdtypes::VOID->getName().data()){
+            return stdtypes::VOID;
+        }
+        else if(type_name == stdtypes::INT->getName().data()){
+            return stdtypes::INT;
+        }
+
 
         first_tok = nextTok();
         if(first_tok.type == TOK_ASTERISK){
@@ -108,6 +120,7 @@ namespace OmegaWrapGen {
                 first_tok = nextTok();
                 auto class_scope = new TreeScope {TreeScope::Class,class_node->name,parentScope};
                 while(first_tok.type != TOK_RBRACE){
+                    std::cout << first_tok.type << "Content:" << first_tok.content << std::endl;
                     auto child_node = buildDecl(first_tok,class_scope);
                     if(!child_node){
                         ERROR_RETURN;
@@ -152,10 +165,12 @@ namespace OmegaWrapGen {
                     first_tok = nextTok();
                     auto _arg_ty = buildType(first_tok);
 
-                    if(!_arg_ty)
+                    if(!_arg_ty) {
                         ERROR_RETURN;
+                    }
 
                     func_decl->params.insert(std::make_pair(name,_arg_ty));
+                    first_tok = nextTok();
                 };
 
                 first_tok = nextTok();
@@ -194,20 +209,35 @@ namespace OmegaWrapGen {
                     first_tok = nextTok();
                 }
                 node = namespace_decl;
+            }
+            else if(first_tok.content == KW_HEADER){
+                auto * header_decl = new HeaderDeclNode();
+                header_decl->type = HEADER_DECL;
+                first_tok = nextTok();
+//                std::cout << first_tok.type << std::endl;
+                if(first_tok.type != TOK_STRLITERAL){
+                    EXPECTED_STR();
+                }
+                header_decl->name = first_tok.content;
+                node = header_decl;
             };
+
             node->scope = parentScope;
             return node;
         }
         else {
             /// Throw Error
+//            std::cout << first_tok.type << std::endl;
             EXPECTED_KW();
         };
+
     };
 
     DeclNode * TreeBuilder::nextDecl(bool *hasErrored){
         *hasErrored = false;
 
         currentTok = nextTok();
+        std::cout << currentTok.type << std::endl;
         if(currentTok.type == TOK_EOF){
             return nullptr;
         };
