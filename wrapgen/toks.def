@@ -26,5 +26,6 @@ typedef int TokTy;
 #define KW_INTERFACE KW("interface")
 #define KW_FUNC KW("func")
 #define KW_NAMESPACE KW("namespace")
+#define KW_NEW KW("new")
 #define KW_CONST KW("const")
 #define KW_HEADER KW("header")

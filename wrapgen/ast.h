@@ -70,6 +70,7 @@ namespace OmegaWrapGen {
     struct FuncDeclNode : public DeclNode {
         OmegaCommon::String name;
         bool isStatic = false;
+        bool isConstructor = false;
         OmegaCommon::MapVec<OmegaCommon::String,Type *> params;
         Type *returnType;
     };
