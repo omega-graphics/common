@@ -57,10 +57,14 @@ if(APPLE)
 	if(NOT CODE_SIGNATURE)
 		message(FATAL_ERROR "CODE_SIGNATURE Variable must be defined in order to sign Apple App and Framework Bundles.")
 	endif()
+	
 	set(APP_BUNDLE_OUTPUT_DIR "${CMAKE_BINARY_DIR}/Apps")
 	set(FRAMEWORK_OUTPUT_DIR "${CMAKE_BINARY_DIR}/Frameworks")
+	
 	set(UNSIGNED_TARGET_SUFFIX __unsigned)
 endif()
+
+
 
 if(XCODE)
     set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_IDENTITY ${CODE_SIGNATURE})
@@ -125,8 +129,8 @@ function(add_framework_bundle)
 	# get_target_property(_PREFIX ${_NAME} SUFFIX)
 		#
 	# message("${_PREFIX}")
-	
-	file(MAKE_DIRECTORY "${FRAMEWORK_OUTPUT_DIR}/${_ARG_NAME}.framework")
+	message("Framework Output Dir:${FRAMEWORK_OUTPUT_DIR}")
+	file(MAKE_DIRECTORY ${FRAMEWORK_OUTPUT_DIR}/${_ARG_NAME}.framework)
 	
     set_target_properties(${_ARG_NAME} 
     PROPERTIES

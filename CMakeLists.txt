@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.9)
 
 set(OMEGACOMMON_VERSION "0.5")
 
-project(OmegaCommon VERSION ${OMEGACOMMON_VERSION} LANGUAGES C CXX)
+include(OmegaGraphicsSuite)
+
+omega_graphics_project(OmegaCommon VERSION ${OMEGACOMMON_VERSION} LANGUAGES C CXX)
 
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
@@ -19,7 +21,7 @@ if(WIN32)
 	target_sources("OmegaCommon" PRIVATE "src/fs-win.cpp"  "src/net-win.cpp" "src/multithread-win.cpp")
 elseif(APPLE)
 	target_sources("OmegaCommon" PRIVATE "src/fs-cocoa.mm"  "src/net-curl.cpp" "src/multithread-unix.cpp")
-	target_link_frameworks("OmegaCommon" "Foundation")
+	target_link_system_frameworks("OmegaCommon" "Foundation")
 endif()
 
 file(GLOB WRAPGEN_SRCS "wrapgen/*.cpp")
