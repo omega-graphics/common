@@ -1,5 +1,6 @@
 #include "ast.h"
 #include <memory>
+#include <deque>
 
 #ifndef OMEGA_WRAPGEN_WRAPPER_GEN_H
 #define OMEGA_WRAPGEN_WRAPPER_GEN_H

@@ -18,7 +18,7 @@ namespace OmegaCommon {
         In addition to performing basic path parsing on construction and runtime, 
         it supports rapid string concatnation as well absolute path resolution.
         */
-        class Path {
+        class OMEGACOMMON_EXPORT Path {
             String _str;
             
             String _dir;
@@ -112,15 +112,15 @@ namespace OmegaCommon {
             return path.exists();
         };
 
-        StatusCode changeCWD(Path newPath);
+        OMEGACOMMON_EXPORT StatusCode changeCWD(Path newPath);
 
-        StatusCode createSymLink(Path  file,Path symlinkDest);
+        OMEGACOMMON_EXPORT StatusCode createSymLink(Path  file,Path symlinkDest);
 
-        StatusCode createDirectory(Path path);
+        OMEGACOMMON_EXPORT StatusCode createDirectory(Path path);
 
-        StatusCode deleteDirectory(Path path);
+        OMEGACOMMON_EXPORT StatusCode deleteDirectory(Path path);
 
-        class DirectoryIterator {
+        class OMEGACOMMON_EXPORT DirectoryIterator {
             Path path;
             Path result_path;
             bool _end;

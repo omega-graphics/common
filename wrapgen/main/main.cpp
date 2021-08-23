@@ -30,7 +30,7 @@ int main(int argc,char *argv[]){
     OmegaCommon::TStrRef src_file;
     OmegaCommon::TStrRef output_dir;
     --argc;
-    unsigned i = 1;
+    unsigned i = 0;
     while(argc > 1){
         OmegaCommon::TStrRef arg(argv[i]);
         if(arg == "--help" || arg == "-h"){

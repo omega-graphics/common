@@ -7,7 +7,7 @@ namespace OmegaCommon {
     class XMLParser;
     class XMLSerializer;
 
-    class XML {
+    class OMEGACOMMON_EXPORT XML {
         String tag;
         Map<String,String> tagProps;
         Vector<XML> children;

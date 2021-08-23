@@ -1,6 +1,7 @@
 #include "wrapper_gen.h"
 
 #include <iostream>
+#include <filesystem>
 
 namespace OmegaWrapGen {
 #define SELF_REFERENCE_VAR "__self"

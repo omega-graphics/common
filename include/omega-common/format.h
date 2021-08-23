@@ -19,7 +19,7 @@ namespace OmegaCommon {
     };
 
     template<class T,class Pr = FormatProvider<T>>
-            struct ObjectFormatProvider : public ObjectFormatProviderBase {
+             struct ObjectFormatProvider : public ObjectFormatProviderBase {
         T & object;
         void insertFormattedObject(std::ostream &os) override {
             Pr::format(os,object);
@@ -63,17 +63,17 @@ namespace OmegaCommon {
 
     class Formatter;
 
-    Formatter *createFormatter(TStrRef fmt,std::ostream & out);
-    void format(Formatter * formatter,ArrayRef<ObjectFormatProviderBase *> objectFormatProviders);
-    void freeFormatter(Formatter *formatter);
+    OMEGACOMMON_EXPORT Formatter *createFormatter(TStrRef fmt,std::ostream & out);
+    OMEGACOMMON_EXPORT void format(Formatter * formatter,ArrayRef<ObjectFormatProviderBase *> objectFormatProviders);
+    OMEGACOMMON_EXPORT void freeFormatter(Formatter *formatter);
 
     template<typename T>
-    ObjectFormatProvider<T> * buildFormatProvider(T object){
+     ObjectFormatProvider<T> * buildFormatProvider(T object){
         return new ObjectFormatProvider<T>(object);
     };
 
     template<class ..._Args>
-    OmegaCommon::String fmtString(const char *fmt,_Args && ...args){
+     OmegaCommon::String fmtString(const char *fmt,_Args && ...args){
         std::ostringstream out;
 //        auto t_args = std::make_tuple(std::forward<_Args>(args)...);
         std::array<ObjectFormatProviderBase *,sizeof...(args)> arrayArgs = {buildFormatProvider(std::forward<_Args>(args))...};

@@ -17,7 +17,7 @@ namespace OmegaCommon {
 
     };
 
-    class HttpClientContext {
+    class OMEGACOMMON_EXPORT HttpClientContext {
     public:
         static std::shared_ptr<HttpClientContext> Create();
         virtual std::future<HttpResponse> makeRequest(HttpRequestDescriptor descriptor) = 0;

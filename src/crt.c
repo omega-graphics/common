@@ -11,15 +11,22 @@ struct __OmegaObject {
     size_t size;
 };
 
-OmegaRTObject * omega_common_alloc(void *data,size_t size){
+OmegaRTObject * omega_common_alloc(void *data,size_t size,OmegaObjectType t){
     OmegaRTObject *rc = malloc(sizeof(OmegaRTObject));
     OmegaRTObject obj;
+    obj.type = t;
     obj.data = malloc(size);
     obj.size = size;
 
     memcpy(obj.data,data,size);
     memcpy(rc,&obj,sizeof(OmegaRTObject));
     return rc;
+};
+
+void omega_common_object_get_data(OmegaRTObject * obj,void **data){
+    if(data != NULL){
+        *data = obj->data;
+    }
 };
 
 OmegaCommonBool omega_common_exists(OmegaRTObject *obj){

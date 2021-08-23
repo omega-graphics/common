@@ -8,6 +8,19 @@
 #include <cstring>
 #include <typeinfo>
 #include <memory>
+#include <cassert>
+
+#ifdef _WIN32
+#ifdef OMEGACOMMON__BUILD__
+#define OMEGACOMMON_EXPORT __declspec(dllexport)
+#else 
+#define OMEGACOMMON_EXPORT __declspec(dllimport)
+#endif
+#else 
+
+#define OMEGACOMMON_EXPORT
+
+#endif
 
 
 #ifndef OMEGA_COMMON_COMMON_UTILS_H
@@ -208,17 +221,17 @@ namespace OmegaCommon {
     typedef StrRefBase<char32_t> UStrRef;
 
 
-    String operator+(const String & lhs,TStrRef & rhs);
-    WString operator+(const WString & lhs,WStrRef & rhs);
-    UString operator+(const UString & lhs,UStrRef & rhs);
+    OMEGACOMMON_EXPORT String operator+(const String & lhs,TStrRef & rhs);
+    OMEGACOMMON_EXPORT WString operator+(const WString & lhs,WStrRef & rhs);
+    OMEGACOMMON_EXPORT UString operator+(const UString & lhs,UStrRef & rhs);
 
-    void operator+=(String & lhs,TStrRef & rhs);
-    void operator+=(WString & lhs,WStrRef & rhs);
-    void operator+=(UString & lhs,UStrRef & rhs);
+    OMEGACOMMON_EXPORT void operator+=(String & lhs,TStrRef & rhs);
+    OMEGACOMMON_EXPORT void operator+=(WString & lhs,WStrRef & rhs);
+    OMEGACOMMON_EXPORT void operator+=(UString & lhs,UStrRef & rhs);
 
-    TStrRef operator&(String & str);
-    WStrRef operator&(WString & str);
-    UStrRef operator&(UString & str);
+    OMEGACOMMON_EXPORT TStrRef operator&(String & str);
+    OMEGACOMMON_EXPORT WStrRef operator&(WString & str);
+    OMEGACOMMON_EXPORT UStrRef operator&(UString & str);
 
 
     template<class T>

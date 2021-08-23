@@ -21,7 +21,7 @@
 namespace OmegaCommon {
     typedef std::thread Thread;
 
-    class Semaphore {
+    class OMEGACOMMON_EXPORT Semaphore {
         #ifdef _WIN32
         HANDLE sem;
         #elif defined(__APPLE__)

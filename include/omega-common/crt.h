@@ -18,7 +18,9 @@ typedef enum {
     TRUE = 0x01,
 } OmegaCommonBool;
 
-OmegaRTObject * omega_common_alloc(void *data,size_t size);
+OmegaRTObject * omega_common_alloc(void *data,size_t size,OmegaObjectType t);
+
+void omega_common_object_get_data(OmegaRTObject * obj,void **data);
 
 OmegaCommonBool omega_common_exists(OmegaRTObject *obj);
 

@@ -11,6 +11,7 @@
 
 #include <icu.h>
 
+#pragma comment(lib,"icuuc.lib")
 #pragma comment(lib,"winhttp.lib")
 
 
@@ -26,7 +27,7 @@ namespace OmegaCommon {
         }
         std::future<HttpResponse> makeRequest(HttpRequestDescriptor descriptor){
             size_t urlLen = descriptor.url.size();
-            UChar url_w[urlLen];
+            auto * url_w = new UChar[urlLen];
             u_charsToUChars(descriptor.url.data(),url_w,(int32_t)urlLen);
             URL_COMPONENTS url_components;
             WinHttpCrackUrl(reinterpret_cast<LPCWSTR>(url_w), urlLen, ICU_DECODE, &url_components);

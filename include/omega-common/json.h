@@ -17,7 +17,7 @@ namespace OmegaCommon {
      @paragraph 
      An instance of this class represents a single JSON Object Node in the JSON object tree.
     */
-    class JSON {
+    class OMEGACOMMON_EXPORT JSON {
         static std::unique_ptr<JSONParser> parser;
 
         static std::unique_ptr<JSONSerializer> serializer;
@@ -72,13 +72,13 @@ namespace OmegaCommon {
      
     };
 
-    std::istream & operator>>(std::istream & in,JSON & json);
-    std::ostream & operator<<(std::ostream & out,JSON & json);
+    OMEGACOMMON_EXPORT std::istream & operator>>(std::istream & in,JSON & json);
+    OMEGACOMMON_EXPORT std::ostream & operator<<(std::ostream & out,JSON & json);
 
     typedef Map<String,JSON> JSONMap;
     typedef Vector<JSON> JSONArray;
 
-    struct JSONConvertible {
+    struct OMEGACOMMON_EXPORT JSONConvertible {
         virtual void toJSON(JSON & j) = 0;
         virtual void fromJSON(JSON & j) = 0;
     };
