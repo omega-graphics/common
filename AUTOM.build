@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 
-Project("omega-common","0.1")
+
+project("omega-common","0.1")
 
 main_srcs = [
     "./src/json.cpp",

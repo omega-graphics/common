@@ -9,6 +9,7 @@
 #include <typeinfo>
 #include <memory>
 #include <cassert>
+#include <optional>
 
 #ifdef _WIN32
 #ifdef OMEGACOMMON__BUILD__
@@ -530,7 +531,74 @@ namespace OmegaCommon {
         Failed
     } StatusCode;
 
-
+//    namespace Argv {
+//        
+//        template<class T>
+//        struct ArgVal{
+//            std::optional<T> value;
+//            inline operator bool(){
+//                return value.has_value();
+//            };
+//            inline operator T & (){
+//                return value.value();
+//            }
+//        };
+//        
+//        enum class ArgumentType : int {
+//            Flag,
+//            Positional,
+//        };
+//        
+//        template<class T>
+//        struct ArgumentDescriptor;
+//        
+//        template<>
+//        struct ArgumentDescriptor<bool> {
+//            TStrRef first;
+//            TStrRef second;
+//        };
+//        
+//        template<>
+//        struct ArgumentDescriptor<String> {
+//            TStrRef first;
+//            TStrRef second;
+//            ArgumentType type;
+//        };
+//        
+//        template<>
+//        struct ArgumentDescriptor<Vector<String>> {
+//            TStrRef first;
+//            TStrRef second;
+//            ArgumentType type;
+//        };
+//        
+//        
+//        class Parser {
+//    
+//        public:
+//            
+//            Parser();
+//            
+//            template<class T>
+//            ArgVal<T> argument(ArgumentDescriptor<T> desc);
+//            
+//            template<>
+//            ArgVal<bool> argument(ArgumentDescriptor<bool> desc){
+//                
+//            };
+//            template<>
+//            ArgVal<String> argument(ArgumentDescriptor<String> desc){
+//                
+//            };
+//            template<>
+//            ArgVal<Vector<String>> argument(ArgumentDescriptor<Vector<String>> desc){
+//                
+//            };
+//            
+//            void parseArgv(int & argc,char **argv);
+//        };
+//        
+//    }
     
 };
 
