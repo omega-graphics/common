@@ -24,10 +24,10 @@ namespace OmegaCommon {
     };
 
     class Formatter {
-        TStrRef fmt;
+        StrRef fmt;
         std::ostream & out;
     public:
-        Formatter(TStrRef & fmt,std::ostream & out):fmt(fmt),out(out){};
+        Formatter(StrRef & fmt, std::ostream & out): fmt(fmt), out(out){};
         void format(ArrayRef<ObjectFormatProviderBase *> & objectFormatProviders){
             std::istringstream in(fmt.data());
 
@@ -84,7 +84,7 @@ namespace OmegaCommon {
         ~Formatter()= default;
     };
 
-    Formatter *createFormatter(TStrRef fmt,std::ostream & out){
+    Formatter *createFormatter(StrRef fmt, std::ostream & out){
         return new Formatter(fmt,out);
     };
 

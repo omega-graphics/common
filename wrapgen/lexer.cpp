@@ -5,7 +5,7 @@ namespace OmegaWrapGen {
 
     struct LexerError : public Diagnostic {
         OmegaCommon::String message;
-        LexerError(OmegaCommon::TStrRef _message):message(_message){
+        LexerError(OmegaCommon::StrRef _message): message(_message){
 
         };
         bool isError() override{
@@ -20,7 +20,7 @@ namespace OmegaWrapGen {
 
     };
 
-    bool isKeyword(OmegaCommon::TStrRef v){
+    bool isKeyword(OmegaCommon::StrRef v){
         return 
         (v == KW_CLASS) || 
         (v == KW_FUNC) || 

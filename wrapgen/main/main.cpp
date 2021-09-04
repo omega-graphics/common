@@ -27,12 +27,12 @@ void printHelp(){
 
 int main(int argc,char *argv[]){
     /// Omit First Arg in `argv`
-    OmegaCommon::TStrRef src_file;
-    OmegaCommon::TStrRef output_dir;
+    OmegaCommon::StrRef src_file;
+    OmegaCommon::StrRef output_dir;
     --argc;
     unsigned i = 0;
     while(argc > 1){
-        OmegaCommon::TStrRef arg(argv[i]);
+        OmegaCommon::StrRef arg(argv[i]);
         if(arg == "--help" || arg == "-h"){
             printHelp();
         }

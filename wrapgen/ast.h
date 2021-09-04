@@ -37,8 +37,8 @@ namespace OmegaWrapGen {
 
         bool isReference;
 
-        static Type * Create(OmegaCommon::TStrRef name,bool isConst = false,bool isPointer = false,bool isReference = false);
-        OmegaCommon::TStrRef getName();
+        static Type * Create(OmegaCommon::StrRef name, bool isConst = false, bool isPointer = false, bool isReference = false);
+        OmegaCommon::StrRef getName();
     };
 
     #define _STANDARD_TYPE(name) extern Type *name

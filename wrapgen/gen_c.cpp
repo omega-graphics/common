@@ -56,9 +56,9 @@ namespace OmegaWrapGen {
             return *ctxt;
         };
 
-        inline std::string createCNameForDeclWithNameAndScope(OmegaCommon::TStrRef name,TreeScope *scope){
+        inline std::string createCNameForDeclWithNameAndScope(OmegaCommon::StrRef name, TreeScope *scope){
             std::ostringstream out;
-            std::vector<OmegaCommon::TStrRef> parentScopes;
+            std::vector<OmegaCommon::StrRef> parentScopes;
             TreeScope *parent;
             if(scope != GLOBAL_SCOPE) {
                 parentScopes.emplace_back(scope->name);
@@ -105,7 +105,7 @@ namespace OmegaWrapGen {
             }
         };
 
-        void writeCFunctionDecl(OmegaCommon::TStrRef name,OmegaCommon::MapVec<OmegaCommon::String,Type *> & params,Type *returnType,std::ostream & out){
+        void writeCFunctionDecl(OmegaCommon::StrRef name, OmegaCommon::MapVec<OmegaCommon::String,Type *> & params, Type *returnType, std::ostream & out){
             out << treeTypeToString(returnType) << " " << name << "(";
             auto param_it = params.begin();
             for(unsigned i = 0;i < params.size();i++){

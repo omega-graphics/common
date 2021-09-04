@@ -23,7 +23,7 @@ namespace OmegaWrapGen {
 
     
 
-    Type * Type::Create(OmegaCommon::TStrRef name,bool isConst,bool isPointer,bool isReference){
+    Type * Type::Create(OmegaCommon::StrRef name, bool isConst, bool isPointer, bool isReference){
         auto t = new Type();
         t->name = name.data();
         t->isConst = isConst;
@@ -32,7 +32,7 @@ namespace OmegaWrapGen {
         return t;
     };
 
-    OmegaCommon::TStrRef Type::getName(){
+    OmegaCommon::StrRef Type::getName(){
         return name;
     };
 

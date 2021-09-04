@@ -55,15 +55,15 @@ namespace OmegaCommon {
     };
 
     template<>
-    struct FormatProvider<TStrRef> {
-        static void format(std::ostream & os,TStrRef & object){
+    struct FormatProvider<StrRef> {
+        static void format(std::ostream & os, StrRef & object){
             os << object.data();
         }
     };
 
     class Formatter;
 
-    OMEGACOMMON_EXPORT Formatter *createFormatter(TStrRef fmt,std::ostream & out);
+    OMEGACOMMON_EXPORT Formatter *createFormatter(StrRef fmt, std::ostream & out);
     OMEGACOMMON_EXPORT void format(Formatter * formatter,ArrayRef<ObjectFormatProviderBase *> objectFormatProviders);
     OMEGACOMMON_EXPORT void freeFormatter(Formatter *formatter);
 

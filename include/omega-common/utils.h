@@ -10,6 +10,7 @@
 #include <memory>
 #include <cassert>
 #include <optional>
+#include <iostream>
 
 #ifdef _WIN32
 #ifdef OMEGACOMMON__BUILD__
@@ -143,31 +144,31 @@ namespace OmegaCommon {
     public:
         typedef unsigned size_type;
     private:
-        size_type _len;
+        const size_type _len;
         using SELF = StrRefBase<CharTY>;
     public:
         using const_iterator = const CharTY *;
         using const_reference = const CharTY &;
 
-        size_type & size(){
+        const size_type & size() const{
             return _len;
         }
-        CharTY *data(){
+        CharTY *data() const{
             return _data;
         }
-        const_iterator begin(){
+        const_iterator begin() const{
             return const_iterator(_data);
         }
-        const_iterator end(){
+        const_iterator end() const{
             return const_iterator(_data + _len);
         }
 
-        const_reference operator[](unsigned idx){
+        const_reference operator[](unsigned idx) const{
             return begin()[idx];
         };
 
     private:
-        bool compare(StrRefBase & str){
+        bool compare(StrRefBase & str) const{
             if(_len != str._len)
                 return false;
             
@@ -197,16 +198,16 @@ namespace OmegaCommon {
 
         }
 
-        bool operator==(std::basic_string<CharTY> & str){
+        bool operator==(std::basic_string<CharTY> & str) const{
             StrRefBase ref(str);
             return compare(ref);
         };
 
-        bool operator==(StrRefBase &str){
+        bool operator==(StrRefBase &str) const{
             return compare(str);
         };
 
-        bool operator==(const CharTY *str){
+        bool operator==(const CharTY *str) const{
             StrRefBase ref(str);
             return compare(ref);
         };
@@ -217,22 +218,50 @@ namespace OmegaCommon {
 
     };
 
-    typedef StrRefBase<char> TStrRef;
+    typedef StrRefBase<char> StrRef;
     typedef StrRefBase<wchar_t> WStrRef;
     typedef StrRefBase<char32_t> UStrRef;
 
 
-    OMEGACOMMON_EXPORT String operator+(const String & lhs,TStrRef & rhs);
-    OMEGACOMMON_EXPORT WString operator+(const WString & lhs,WStrRef & rhs);
-    OMEGACOMMON_EXPORT UString operator+(const UString & lhs,UStrRef & rhs);
+    OMEGACOMMON_EXPORT String operator+(const String & lhs,const StrRef & rhs);
+    OMEGACOMMON_EXPORT WString operator+(const WString & lhs,const WStrRef & rhs);
+    OMEGACOMMON_EXPORT UString operator+(const UString & lhs,const UStrRef & rhs);
 
-    OMEGACOMMON_EXPORT void operator+=(String & lhs,TStrRef & rhs);
+    OMEGACOMMON_EXPORT void operator+=(String & lhs, StrRef & rhs);
     OMEGACOMMON_EXPORT void operator+=(WString & lhs,WStrRef & rhs);
     OMEGACOMMON_EXPORT void operator+=(UString & lhs,UStrRef & rhs);
 
-    OMEGACOMMON_EXPORT TStrRef operator&(String & str);
+    OMEGACOMMON_EXPORT StrRef operator&(String & str);
     OMEGACOMMON_EXPORT WStrRef operator&(WString & str);
     OMEGACOMMON_EXPORT UStrRef operator&(UString & str);
+
+
+    /// @brief An Inline String Stream.
+    /// @paragraph Very similar to llvm::Twine
+    template<class CharT>
+    class SnakeStr {
+        CharT *buffer;
+    public:
+        typedef unsigned size_type;
+    private:
+        typedef SnakeStr self;
+        size_type _len;
+        void _grow(size_type n){
+
+        }
+    public:
+        size_type & size(){
+            return _len;
+        }
+        self & operator +(char c){
+
+        }
+        ~SnakeStr(){
+            delete buffer;
+        }
+    };
+
+//    typedef InlineSStream_Base<char> InlineSStream;
 
 
     template<class T>
@@ -387,144 +416,70 @@ namespace OmegaCommon {
         return other;
     };
 
-    // template<class T>
-    // class ArcPtr {
-    //     struct _ptr_data {
-    //         T *data;
-    //         unsigned ref_count;
-    //     };
-    //     _ptr_data * _data;
-    // private:
-    //     ArcPtr(_ptr_data *data):_data(data){
-    //         _data->ref_count += 1;
-    //     };
-    // public:
-    //     _ptr_data * _get_data() const{
-    //         return _data;
-    //     };
-    // public:
-    //     T & operator*() throw(){
-    //         return *_data->data;
-    //     };
-    //     auto operator->(){
-    //         return _data->data;
-    //     };
+    struct RuntimeObject {
+        unsigned refCount;
+        void inc() { refCount += 1;};
+        void dec() {refCount -= 1;}
+        RuntimeObject(int i) : refCount(1){
 
-    //     operator bool() const{
-    //         return _data != nullptr;
-    //     };
+        }
+    };
 
-    //     // template<class _nTy>
-    //     // ArcPtr<_nTy> castAs(){
-    //     //     if(typeid(_nTy) == _data->t)
-    //     //         return *this;
-    //     //     else  
-    //     //         return nullptr;
-    //     // };
+    template<class T,std::enable_if_t<std::is_base_of_v<RuntimeObject,T>,int> = 0>
+    class ARC {
+        T *data;
+    public:
+        operator bool(){
+            return data != nullptr;
+        }
+        T & operator *() const{
+            return *data;
+        }
+        T * operator->() const{
+            return data;
+        }
+        explicit ARC(T * ptr){
+            data = ptr;
+        };
+        template<class OTy,std::enable_if_t<std::is_convertible_v<OTy,T>,int> = 0>
+        ARC(OTy * ptr){
+            data = ptr;
+        };
+        template<class OTy,std::enable_if_t<std::is_convertible_v<OTy,T>,int> = 0>
+        ARC(const ARC<OTy> &other){
+            data = other.data;
+            data->inc();
+        }
+        template<class OTy,std::enable_if_t<std::is_convertible_v<OTy,T>,int> = 0>
+        ARC(ARC<OTy> && other){
+            data = other.data;
+            data->inc();
+        }
+        ~ARC(){
+            data->dec();
+            if(data->refCount == 0){
+                delete data;
+            }
+        };
+    };
 
-    //     template<class _nTy,std::enable_if_t<std::is_base_of_v<T,_nTy>,int> = 0>
-    //     ArcPtr<_nTy> downcastAs(){
-    //         if(!_data){
-    //             return nullptr;
-    //         };
-    //         return *this;
-    //     };
+    template<class T,class ...Args>
+    ARC<T> makeARC(Args && ...args){
+        return ARC<T>(new T(args...));
+    };
 
-    //     template<class _nTy,std::enable_if_t<std::is_convertible_v<T,_nTy>,int> = 0>
-    //     ArcPtr<_nTy> castTo(){
-    //         if(!_data){
-    //             return nullptr;
-    //         };
-    //         return *this;
-    //     };
-        
-    //     ArcPtr():_data(nullptr){
+    template<class T>
+    struct RuntimeTypeWrapper : public RuntimeObject {
+        T data;
+    };
 
-    //     };
+    template<class T>
+    using ARCAny = ARC<RuntimeTypeWrapper<T>>;
 
-    //     ArcPtr(decltype(nullptr)):_data(nullptr){
-
-    //     };
-
-    //     ArcPtr(T * _ptr):_data(new _ptr_data()){
-    //         _data->data = _ptr;
-    //         _data->ref_count = 1;
-    //     };
-
-        
-    //     ArcPtr(const ArcPtr & other):_data((_ptr_data *)other._get_data()){
-    //         _data->ref_count += 1;
-    //     };
-
-      
-    //     ArcPtr(ArcPtr && other):_data((_ptr_data *)other._get_data()){
-    //         _data->ref_count += 1;
-    //     };
-
-    //     template<class _Ty,std::enable_if_t<std::is_base_of_v<_Ty,T>,int> = 0>
-    //     ArcPtr(const ArcPtr<_Ty> & other):_data((_ptr_data *)other._get_data()){
-    //         _data->ref_count += 1;
-    //     };
-
-    //     template<class _Ty,std::enable_if_t<std::is_base_of_v<_Ty,T>,int> = 0>
-    //     ArcPtr(ArcPtr<_Ty> && other):_data((_ptr_data *)other._get_data()){
-    //         _data->ref_count += 1;
-    //     };
-
-    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<_Ty,T>,int> = 0>
-    //     ArcPtr(const ArcPtr<_Ty> & other):_data((_ptr_data *)other._get_data()){
-    //         _data->ref_count += 1;
-    //     };
-
-    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<_Ty,T>,int> = 0>
-    //     ArcPtr(ArcPtr<_Ty> && other):_data((_ptr_data *)other._get_data()){
-    //         _data->ref_count += 1;
-    //     };
-
-
-
-    //     inline ArcPtr & operator=(ArcPtr && other){
-    //         _data = (_ptr_data *)other._get_data();
-    //         _data->ref_count += 1;
-    //         return *this;
-    //     };
-        
-    //     inline ArcPtr & operator=(const ArcPtr & other){
-    //         _data = (_ptr_data *)other._get_data();
-    //         _data->ref_count += 1;
-    //         return *this;
-    //     };
-
-    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<T,_Ty>,int> = 0>
-    //     inline ArcPtr<T> & operator=(const ArcPtr<_Ty> & other){
-    //         _data = (_ptr_data *)other._get_data();
-    //         _data->ref_count += 1;
-    //         return *this;
-    //     };
-
-    //     template<class _Ty,std::enable_if_t<std::is_convertible_v<T,_Ty>,int> = 0>
-    //     inline ArcPtr<T> & operator=(ArcPtr<_Ty> && other){
-    //         _data = (_ptr_data *)other._get_data();
-    //         _data->ref_count += 1;
-    //         return *this;
-    //     };
-
-    //     ~ArcPtr(){
-    //         if(_data != nullptr){
-    //             _data->ref_count -= 1;
-    //             if(_data->ref_count == 0){
-    //                 delete _data->data;
-    //                 delete _data;
-    //             };
-    //         };
-    //     };
-    // };
-
-    // template<class T,class ..._Args>
-    // ArcPtr<T> make_arc(_Args && ...args){
-    //     return ArcPtr<T>(new T(args...));
-    // };
-
+    template<class T,class ...Args>
+    ARCAny<T> makeARCAny(Args && ...args){
+        return ARCAny<T>(new RuntimeTypeWrapper<T>{{args...}});
+    };
 
     typedef enum : int {
         Ok,
@@ -532,77 +487,119 @@ namespace OmegaCommon {
     } StatusCode;
 
 //    namespace Argv {
-//        
+//
 //        template<class T>
 //        struct ArgVal{
-//            std::optional<T> value;
+//            std::shared_ptr<T> value;
 //            inline operator bool(){
-//                return value.has_value();
+//                return value;
 //            };
 //            inline operator T & (){
-//                return value.value();
+//                return *value;
 //            }
 //        };
-//        
+//
 //        enum class ArgumentType : int {
 //            Flag,
 //            Positional,
 //        };
-//        
+//
+//        struct Flag {
+//            StrRef val;
+//            Flag(StrRef val):val(val){
+//
+//            }
+//        };
+//
+//        struct Desc {
+//            StrRef val;
+//            Desc(StrRef val):val(val){
+//
+//            }
+//        };
+//
 //        template<class T>
-//        struct ArgumentDescriptor;
-//        
-//        template<>
-//        struct ArgumentDescriptor<bool> {
-//            TStrRef first;
-//            TStrRef second;
+//        struct ArgumentParser;
+//
+//        struct ArgumentParserBase {
+//            virtual void printHelp() = 0;
+//            virtual bool parseArg(OmegaCommon::StrRef arg) = 0;
 //        };
-//        
-//        template<>
-//        struct ArgumentDescriptor<String> {
-//            TStrRef first;
-//            TStrRef second;
+//
+//        template<class T,
+//                std::enable_if_t<std::is_function_v<decltype(ArgumentParser<T>::help)>,int> = 0,
+//                std::enable_if_t<std::is_function_v<decltype(ArgumentParser<T>::format)>,int> = 0>
+//        struct ArgumentParserImpl : public ArgumentParserBase {
+//
+//            std::vector<std::string> flagMatches;
+//            Desc desc;
 //            ArgumentType type;
+//            std::shared_ptr<T> & val;
+//
+//            ArgumentParserImpl(ArgumentType type,std::vector<std::string> flagMatches, Desc & desc,std::shared_ptr<T> & val):
+//            flagMatches(flagMatches),
+//            desc(desc),
+//            type(type),val(val){
+//
+//            };
+//
+//            void printHelp() override{
+//                ArgumentParser<T>::help(std::cout);
+//            }
+//
+//            bool parseArg(OmegaCommon::StrRef arg) override{
+//                return ArgumentParser<T>::format(arg,flagMatches,val);
+//            }
 //        };
-//        
+//
 //        template<>
-//        struct ArgumentDescriptor<Vector<String>> {
-//            TStrRef first;
-//            TStrRef second;
-//            ArgumentType type;
+//        struct  ArgumentParser<bool> {
+//
+//            static void help(std::ostream & out,Desc & desc,ArrayRef<std::string> & m){
+//
+//            }
+//            static bool parse(OmegaCommon::StrRef arg,const ArrayRef<std::string> & m,std::shared_ptr<bool> & value){
+//
+//            }
 //        };
-//        
-//        
+//
+//
+//        template<class T,class ..._Args>
+//        ArgumentParserBase * buildArgumentParser(std::shared_ptr<T> & val,ArgumentType type,std::vector<std::string> flagMatches, Desc & desc){
+//            return new ArgumentParserImpl<T>(type,flagMatches,desc,val);
+//        };
+//
+//
 //        class Parser {
-//    
+//
 //        public:
-//            
+//
 //            Parser();
-//            
+//
 //            template<class T>
-//            ArgVal<T> argument(ArgumentDescriptor<T> desc);
-//            
+//            ArgVal<T> argument();
+//
 //            template<>
-//            ArgVal<bool> argument(ArgumentDescriptor<bool> desc){
-//                
+//            ArgVal<bool> argument(){
+//
 //            };
 //            template<>
-//            ArgVal<String> argument(ArgumentDescriptor<String> desc){
-//                
+//            ArgVal<String> argument(){
+//
 //            };
 //            template<>
-//            ArgVal<Vector<String>> argument(ArgumentDescriptor<Vector<String>> desc){
-//                
+//            ArgVal<Vector<String>> argument(){
+//
 //            };
-//            
+//
 //            void parseArgv(int & argc,char **argv);
 //        };
-//        
+//
 //    }
     
 };
 
-inline std::ostream & operator<<(std::ostream &os,OmegaCommon::TStrRef &str){
+inline std::ostream & operator<<(std::ostream &os,OmegaCommon::StrRef &str){
     return os << str.data();
 };
 

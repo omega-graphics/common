@@ -148,16 +148,19 @@
 
     Path & Path::append(const char *str){
         _str = _str + PATH_SLASH + str;
+        parse(_str);
         return *this;
     };
 
-    Path & Path::append(String & str){
+    Path & Path::append(const String & str){
         _str += PATH_SLASH + str;
+        parse(_str);
         return *this;
     };
 
-    Path & Path::append(TStrRef & str){
+    Path & Path::append(const StrRef & str){
         _str = _str + PATH_SLASH + str;
+        parse(_str);
         return *this;
     };
 
@@ -165,7 +168,7 @@
         parse(str);
     };
 
-    Path::Path(TStrRef & str){
+    Path::Path(StrRef & str){
         parse(str.data());
     };
 
@@ -179,11 +182,11 @@
         return _str + PATH_SLASH + str;
     };
 
-    Path Path::operator+(String & str){
+    Path Path::operator+(const String & str){
         return _str + PATH_SLASH + str;
     };
 
-    Path Path::operator+(TStrRef & str){
+    Path Path::operator+(const StrRef & str){
         return _str + PATH_SLASH + str;
     };
 

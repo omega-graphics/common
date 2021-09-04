@@ -125,7 +125,7 @@ namespace OmegaCommon::FS {
         }
         else 
         {
-            TStrRef view(ent->d_name,ent->d_namlen);
+            StrRef view(ent->d_name, ent->d_namlen);
             result_path = path + "/" + view;
         }
         return *this;

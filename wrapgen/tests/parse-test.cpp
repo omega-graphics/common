@@ -9,7 +9,7 @@ int main(int argc,char *argv[]){
 
     Parser parser {&tree};
 
-    OmegaCommon::TStrRef filename {argv[1]};
+    OmegaCommon::StrRef filename {argv[1]};
 
     std::ifstream in {filename};
 

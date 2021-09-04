@@ -12,7 +12,7 @@ namespace OmegaWrapGen {
 
     struct GenContext {
         OmegaCommon::String name;
-        OmegaCommon::TStrRef output_dir;
+        OmegaCommon::StrRef output_dir;
     };
 
     struct CGenSettings {
@@ -22,16 +22,16 @@ namespace OmegaWrapGen {
             Kebab
         } NameCase;
         NameCase nameCase;
-//        OmegaCommon::TStrRef headerName;
+//        OmegaCommon::StrRef headerName;
     };
 
 
     class Gen : public TreeConsumer {
         friend class Parser;
     public:
-        inline std::string generateCXXName(OmegaCommon::TStrRef declName,TreeScope *scope){
+        inline std::string generateCXXName(OmegaCommon::StrRef declName, TreeScope *scope){
             std::ostringstream out;
-            std::deque<OmegaCommon::TStrRef> scopes;
+            std::deque<OmegaCommon::StrRef> scopes;
             TreeScope *parent;
             if(scope != GLOBAL_SCOPE){
                 while((parent = scope->parentScope) != GLOBAL_SCOPE){

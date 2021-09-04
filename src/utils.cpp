@@ -2,21 +2,21 @@
 
 namespace OmegaCommon {
 
-    String operator+(const String & lhs,TStrRef & rhs){
+    String operator+(const String & lhs,const StrRef & rhs){
         String ret;
         ret = lhs;
         ret.resize(ret.size() + rhs.size());
         std::copy(rhs.begin(),rhs.end(),ret.begin());
         return ret;
     }
-    WString operator+(const WString & lhs,WStrRef & rhs){
+    WString operator+(const WString & lhs,const WStrRef & rhs){
         WString ret;
         ret = lhs;
         ret.resize(ret.size() + rhs.size());
         std::copy(rhs.begin(),rhs.end(),ret.begin());
         return ret;
     }
-    UString operator+(const UString & lhs,UStrRef & rhs){
+    UString operator+(const UString & lhs,const UStrRef & rhs){
         UString ret;
         ret = lhs;
         ret.resize(ret.size() + rhs.size());
@@ -24,7 +24,7 @@ namespace OmegaCommon {
         return ret;
     }
 
-    void operator+=(String & lhs,TStrRef & rhs){
+    void operator+=(String & lhs, StrRef & rhs){
         lhs.resize(lhs.size() + rhs.size());
         std::copy(rhs.begin(),rhs.end(),lhs.begin());
     }
@@ -37,7 +37,7 @@ namespace OmegaCommon {
         std::copy(rhs.begin(),rhs.end(),lhs.begin());
     }
 
-    TStrRef operator&(String & str){
+    StrRef operator&(String & str){
         return str;
     }
     WStrRef operator&(WString & str){

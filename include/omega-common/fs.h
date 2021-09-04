@@ -52,22 +52,22 @@ namespace OmegaCommon {
              @param str 
              @returns Path
             */
-            SELF & append(String & str);
+            SELF & append(const String & str);
 
             /**
-             @brief Appends a TStrRef to the end of the path.
+             @brief Appends a StrRef to the end of the path.
              @param str 
              @returns Path
             */
-            SELF & append(TStrRef & str);
+            SELF & append(const StrRef & str);
 
             /// @name Concat Operators
             /// @{
             SELF operator+(const char *str);
 
-            SELF operator+(String & str);
+            SELF operator+(const String & str);
 
-             SELF operator+(TStrRef & str);
+             SELF operator+(const StrRef & str);
             /// @}
             /**
              Retrieve the path as a string. (Relative path) 
@@ -101,7 +101,7 @@ namespace OmegaCommon {
             bool exists();
             Path(const char * str);
             Path(const String & str);
-            Path(TStrRef & str);
+            Path(StrRef & str);
             ~Path();
             bool isFile();
             bool isDirectory();

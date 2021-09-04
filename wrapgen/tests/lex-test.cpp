@@ -7,7 +7,7 @@ using namespace OmegaWrapGen;
 
 int main(int argc,char *argv[]){
 
-    OmegaCommon::TStrRef flag {argv[1]};
+    OmegaCommon::StrRef flag {argv[1]};
 
     std::ifstream in(flag.data());
     DiagnosticBuffer buffer;
