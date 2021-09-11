@@ -140,7 +140,7 @@ namespace OmegaCommon {
     */
     template<class CharTY>
     class StrRefBase {
-        CharTY *_data;
+        const CharTY *_data;
     public:
         typedef unsigned size_type;
     private:
@@ -153,7 +153,7 @@ namespace OmegaCommon {
         const size_type & size() const{
             return _len;
         }
-        CharTY *data() const{
+        const CharTY *data() const{
             return _data;
         }
         const_iterator begin() const{
@@ -186,7 +186,7 @@ namespace OmegaCommon {
 
         };
 
-        StrRefBase(std::basic_string<CharTY> & strty):_data(strty.data()),_len(strty.size()){
+        StrRefBase(const std::basic_string<CharTY> & str):_data(str.data()),_len(str.size()){
 
         }
 
@@ -198,7 +198,7 @@ namespace OmegaCommon {
 
         }
 
-        bool operator==(std::basic_string<CharTY> & str) const{
+        bool operator==(const std::basic_string<CharTY> & str) const{
             StrRefBase ref(str);
             return compare(ref);
         };
@@ -212,11 +212,35 @@ namespace OmegaCommon {
             return compare(ref);
         };
 
+        bool operator!=(const std::basic_string<CharTY> & str) const{
+            StrRefBase ref(str);
+            return !compare(ref);
+        };
+
+        bool operator!=(StrRefBase &str) const{
+            return !compare(str);
+        };
+
+        bool operator!=(const CharTY *str) const{
+            StrRefBase ref(str);
+            return !compare(ref);
+        };
+
         operator std::basic_string<CharTY>(){
             return {this->begin(),this->end()};
         };
 
     };
+
+    template<class CharTy>
+    inline bool operator==(const std::basic_string<CharTy> & lhs,const StrRefBase<CharTy> & rhs){
+        return rhs == lhs;
+    }
+
+    template<class CharTy>
+    inline bool operator==(const char * lhs,const StrRefBase<CharTy> & rhs){
+        return rhs == lhs;
+    }
 
     typedef StrRefBase<char> StrRef;
     typedef StrRefBase<wchar_t> WStrRef;

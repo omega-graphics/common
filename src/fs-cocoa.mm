@@ -89,12 +89,16 @@ namespace OmegaCommon::FS {
         NSURL *fileUrl = [NSURL fileURLWithFileSystemRepresentation:path.str().c_str() isDirectory:YES relativeToURL:nil];
         NSError *error;
         [fileManager createDirectoryAtURL:fileUrl withIntermediateDirectories:YES attributes:nil error:&error];
-        if(error.code >= 0){
-            return Ok;
-        }
-        else {
-            return Failed;
-        };
+//        if(error.domain == nil) {
+//            return Ok;
+//        }
+//        if(error.code >= 0){
+//            return Ok;
+//        }
+//        else {
+//            return Failed;
+//        };
+        return Ok;
     };
 
     StatusCode deleteDirectory(Path path){
