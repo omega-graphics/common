@@ -61,6 +61,27 @@ namespace OmegaCommon {
             */
             SELF & append(const StrRef & str);
 
+            /**
+             Appends a CString to the end of the path.
+             @param str 
+             @returns Path
+            */
+            SELF & concat(const char *str);
+
+            /**
+             @brief Appends a String to the end of the path.
+             @param str 
+             @returns Path
+            */
+            SELF & concat(const String & str);
+
+            /**
+             @brief Appends a StrRef to the end of the path.
+             @param str 
+             @returns Path
+            */
+            SELF & concat(const StrRef & str);
+
             /// @name Concat Operators
             /// @{
             SELF operator+(const char *str);

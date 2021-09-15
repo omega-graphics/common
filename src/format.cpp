@@ -4,13 +4,21 @@
 
 namespace OmegaCommon {
 
+    inline int power_int(int & val,unsigned power){
+        int result = val;
+        for(;power > 0;power--){
+            result *= val;
+        }
+        return result;
+    }
+
 
     class ScalableInteger {
         std::vector<int> buffer;
     public:
         void addPlace(int val){
             for(auto & d : buffer){
-                d *= std::pow(d,buffer.size());
+                d *= power_int(d,buffer.size());
             }
             buffer.push_back(val);
         }

@@ -23,6 +23,8 @@ if(WIN32)
 elseif(APPLE)
 	target_sources("OmegaCommon" PRIVATE "src/fs-cocoa.mm"  "src/net-curl.cpp" "src/multithread-unix.cpp")
 	target_link_system_frameworks("OmegaCommon" "Foundation")
+elseif(UNIX)
+	target_sources("OmegaCommon" PRIVATE "src/fs-unixother.cpp" "src/multithread-unix.cpp")
 endif()
 
 file(GLOB WRAPGEN_SRCS "wrapgen/*.cpp")

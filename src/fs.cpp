@@ -16,8 +16,6 @@
     };
  
     void Path::parse(const String & str){
-
-        _str = str;
         std::istringstream is(_str);
 
         Vector<Token> tokens;
@@ -109,6 +107,11 @@
                 auto & tok2 = *it;
                 if(tok2.type == Token::Dot){
                     _ext = tok.str;
+                }
+                else {
+                    _fname = tok.str;
+                    ++it;
+                    continue;
                 };
                 ++it;
                 tok2 = *it;
@@ -145,6 +148,24 @@
         return _str;
     };
 
+    Path & Path::concat(const char *str){
+        _str += str;
+        parse(_str);
+        return *this;
+    }
+
+    Path & Path::concat(const String & str){
+        _str += str;
+        parse(_str);
+        return *this;
+    }
+
+    Path & Path::concat(const StrRef & str){
+        _str += str.data();
+        parse(_str);
+        return *this;
+    }
+
 
     Path & Path::append(const char *str){
         _str = _str + PATH_SLASH + str;
@@ -153,7 +174,7 @@
     };
 
     Path & Path::append(const String & str){
-        _str += PATH_SLASH + str;
+        _str = _str + PATH_SLASH + str;
         parse(_str);
         return *this;
     };
@@ -164,15 +185,15 @@
         return *this;
     };
 
-    Path::Path(const char *str){
+    Path::Path(const char *str):_str(str){
         parse(str);
     };
 
-    Path::Path(StrRef & str){
+    Path::Path(StrRef & str):_str(str.data()){
         parse(str.data());
     };
 
-    Path::Path(const String & str){
+    Path::Path(const String & str):_str(str){
         parse(str);
     };
 

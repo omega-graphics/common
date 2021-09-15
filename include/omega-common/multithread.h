@@ -27,7 +27,7 @@ namespace OmegaCommon {
         #elif defined(__APPLE__)
         dispatch_semaphore_t sem;
         #else
-        sem_t * sem;
+        sem_t sem;
         #endif
     public:
         Semaphore(int initialValue);
