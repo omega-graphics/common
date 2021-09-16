@@ -260,36 +260,57 @@ namespace OmegaCommon {
     OMEGACOMMON_EXPORT UStrRef operator&(UString & str);
 
 
-    /// @brief An Inline String Stream.
-    /// @paragraph Very similar to llvm::Twine
-    template<class CharT>
-    class SnakeStr {
-        CharT *buffer;
-    public:
-        typedef unsigned size_type;
-    private:
-        typedef SnakeStr self;
-        size_type _len;
-        void _grow(size_type n){
-
-        }
-    public:
-        size_type & size(){
-            return _len;
-        }
-        self & operator +(char c){
-
-        }
-        ~SnakeStr(){
-            delete buffer;
-        }
-    };
-
-//    typedef InlineSStream_Base<char> InlineSStream;
-
 
     template<class T>
     using Vector = std::vector<T>;
+
+    template<class T,class Comp = std::equal_to<T>>
+    class SetVector : Vector<T>{
+        Comp compare;
+        typedef Vector<T> super;
+    public:
+        typedef typename super::size_type size_type;
+        typedef typename super::iterator iterator;
+        typedef typename super::reference reference;
+
+        size_type & size() const{
+            return super::size();
+        }
+
+        iterator begin(){
+            return super::begin();
+        }
+
+        iterator end(){
+            return super::end();
+        }
+
+        iterator find(const T & el){
+            auto it = begin();
+            for(;it != end();it++){
+                if(compare(*it,el)){
+                    break;
+                }
+            }
+            return it;
+        }
+
+        void push(const T & el){
+            if(find(el) == end())
+                super::push_back(el);
+        }
+
+        void push(T && el){
+            if(find(el) == end())
+                super::push_back(el);
+        }
+
+        void pop(){
+            super::pop_back();
+        }
+    };
+
+
 
     template<class T,unsigned len>
     using Array = std::array<T,len>;
@@ -444,13 +465,14 @@ namespace OmegaCommon {
         unsigned refCount;
         void inc() { refCount += 1;};
         void dec() {refCount -= 1;}
-        RuntimeObject(int i) : refCount(1){
+        RuntimeObject() : refCount(1){
 
         }
     };
 
     template<class T,std::enable_if_t<std::is_base_of_v<RuntimeObject,T>,int> = 0>
     class ARC {
+    protected:
         T *data;
     public:
         operator bool(){
@@ -498,7 +520,18 @@ namespace OmegaCommon {
     };
 
     template<class T>
-    using ARCAny = ARC<RuntimeTypeWrapper<T>>;
+    class ARCAny : protected ARC<RuntimeTypeWrapper<T>> {
+    public:
+        explicit ARCAny(RuntimeTypeWrapper<T> * ptr): ARC<RuntimeTypeWrapper<T>>(ptr){
+
+        }
+        T & operator *() const {
+            return this->data->data;
+        }
+        T * operator->() const {
+            return &(this->data->data);
+        }
+    };
 
     template<class T,class ...Args>
     ARCAny<T> makeARCAny(Args && ...args){
@@ -622,6 +655,8 @@ namespace OmegaCommon {
 //    }
     
 };
+
+bool findProgramInPath(const OmegaCommon::StrRef & prog,OmegaCommon::String & out);
 
 inline std::ostream & operator<<(std::ostream &os,OmegaCommon::StrRef &str){
     return os << str.data();

@@ -1,4 +1,5 @@
 #include "omega-common/utils.h"
+#include "omega-common/fs.h"
 
 namespace OmegaCommon {
 
@@ -49,6 +50,41 @@ namespace OmegaCommon {
     
     namespace Argv {
         
+    }
+    bool findProgramInPath(const StrRef & prog,String & out) {
+
+        const char *path;
+#ifdef _WIN32
+        path = std::getenv("Path");
+#else
+        path = std::getenv("PATH");
+#endif
+
+        std::istringstream in(path);
+
+        OmegaCommon::String str;
+        while(!in.eof()) {
+    #ifdef _WIN32
+            std::getline(in,str,';');
+    #else
+            std::getline(in,str,':');
+
+            auto current_path = FS::Path(str).append(prog);
+    #ifdef _WIN32
+            current_path.concat(".exe");
+    #endif
+            if(current_path.exists()){
+                if(current_path.isSymLink()){
+                    out = current_path.followSymlink().str();
+                }
+                else {
+                    out = current_path.str();
+                }
+                return true;
+            }
+        }
+    #endif
+        return false;
     }
 
 }

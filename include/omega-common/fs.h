@@ -120,13 +120,19 @@ namespace OmegaCommon {
             */
             String absPath();
             bool exists();
+
+            bool isFile();
+
+            bool isDirectory();
+
+            bool isSymLink();
+
+            Path followSymlink();
+
             Path(const char * str);
             Path(const String & str);
             Path(StrRef & str);
             ~Path();
-            bool isFile();
-            bool isDirectory();
-            bool isSymLink();
         };
 
         inline bool exists(Path path){

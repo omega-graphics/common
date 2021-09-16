@@ -35,6 +35,19 @@ namespace OmegaCommon::FS {
         return fileType == NSFileTypeSymbolicLink;
     };
 
+    Path Path::followSymlink() {
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSString *str = [[NSString alloc] initWithUTF8String:_str.c_str()];
+        NSError *error;
+        NSString *returnPath = [fileManager destinationOfSymbolicLinkAtPath:str error:&error];
+        if(error.code >= 0){
+            return *this;
+        }
+        else {
+            return {returnPath.UTF8String};
+        }
+    }
+
     bool Path::exists(){
         NSFileManager *fileManager = [NSFileManager defaultManager];
         BOOL rc = [fileManager fileExistsAtPath:[[NSString alloc] initWithUTF8String:absPath().c_str()]];
