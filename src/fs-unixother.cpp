@@ -2,6 +2,7 @@
 #include "omega-common/fs.h"
 
 #include <dirent.h>
+#include <linux/limits.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,6 +46,27 @@ namespace OmegaCommon::FS {
 	StatusCode changeCWD(Path newPath){
 		chdir(newPath.absPath().c_str());
 		return Ok;
+	}
+
+	bool Path::isSymLink(){
+		struct stat st = {0};
+		auto p = absPath();
+		if(stat(p.c_str(),&st) == -1){
+			return false;
+		}
+		else {
+			return bool(st.st_mode & S_IFLNK);
+		};
+	}
+
+	Path Path::followSymlink(){
+		assert(isSymLink() && "The path is not a symlink!");
+		auto p = absPath();
+		OmegaCommon::String str;
+		str.resize(PATH_MAX);
+		auto n_size = readlink(p.c_str(),str.data(),PATH_MAX);
+		str.resize(n_size);
+		return {str};
 	}
 
 	bool Path::exists(){

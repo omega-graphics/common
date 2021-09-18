@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <semaphore.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 
