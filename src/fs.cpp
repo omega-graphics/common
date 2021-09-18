@@ -180,7 +180,7 @@
     };
 
     Path & Path::append(const StrRef & str){
-        _str = _str + PATH_SLASH + str;
+        _str = _str + PATH_SLASH + str.data();
         parse(_str);
         return *this;
     };

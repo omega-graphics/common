@@ -52,20 +52,53 @@ namespace OmegaCommon {
 
     ChildProcess ChildProcess::Open(const OmegaCommon::String &cmd, const OmegaCommon::Vector<const char *> &args) {
         ChildProcess process;
-        process.pid = fork();
+        pid_t pid;
         /// Child Process and Parent Process Split
-        if(process.pid == 0){
+        if((pid = fork()) == 0){
             /// CHILD PROCESS!
             auto rc = execv(cmd.data(),(char *const *)args.data());
             exit(rc);
         }
+        else {
+            process.pid = pid;
+            process.use_pipe = false;
+        }
+        return process;
+    }
+
+    ChildProcess ChildProcess::OpenWithStdoutPipe(const OmegaCommon::String &cmd, const char *args) {
+        ChildProcess process;
+        process.use_pipe = true;
+        auto f = popen((OmegaCommon::String(cmd) + args).c_str(),"r");
+        process.p_file = f;
+        return process;
     }
 
     int ChildProcess::wait() {
-        /// PARENT PROCESS!
         int rc;
-        waitpid(pid,&rc,0);
-        pid = -1;
+
+        /// PARENT PROCESS!
+        if(use_pipe){
+            if(p_file == nullptr){
+                return -1;
+            }
+            char *data;
+            auto len = fseeko(p_file,1,SEEK_END);
+            if(len > 0){
+                fseeko(p_file,0,SEEK_SET);
+                data = new char[len];
+                fread(data,1,len,p_file);
+                std::cout << data << std::endl;
+                delete data;
+            }
+
+            rc = pclose(p_file);
+            p_file = nullptr;
+        }
+        else {
+            waitpid(pid,&rc,0);
+            pid = -1;
+        }
         return rc;
     }
 

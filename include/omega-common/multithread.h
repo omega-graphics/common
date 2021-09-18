@@ -40,9 +40,12 @@ namespace OmegaCommon {
 #ifdef _WIN32
         HANDLE handle;
 #else
+        FILE *p_file = nullptr;
+        bool use_pipe;
         pid_t pid;
 #endif
     public:
+        static ChildProcess OpenWithStdoutPipe(const OmegaCommon::String & cmd,const char * args);
         static ChildProcess Open(const OmegaCommon::String & cmd,const OmegaCommon::Vector<const char *> & args);
         int wait();
         ~ChildProcess();
