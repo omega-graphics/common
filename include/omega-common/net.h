@@ -10,7 +10,7 @@ namespace OmegaCommon {
 
 
     struct HttpRequestDescriptor {
-        TStrRef url;
+        StrRef url;
     };
 
     struct HttpResponse {

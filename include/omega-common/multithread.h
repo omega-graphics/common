@@ -30,7 +30,7 @@ namespace OmegaCommon {
         sem_t sem;
         #endif
     public:
-        Semaphore(int initialValue);
+        explicit Semaphore(int initialValue);
         void release();
         void get();
         ~Semaphore();
@@ -38,7 +38,7 @@ namespace OmegaCommon {
 
     class ChildProcess {
 #ifdef _WIN32
-        HANDLE handle;
+        PROCESS_INFORMATION processInformation;
 #else
         FILE *p_file = nullptr;
         bool use_pipe;
