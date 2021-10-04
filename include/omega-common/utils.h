@@ -461,6 +461,185 @@ namespace OmegaCommon {
         return other;
     };
 
+    /// A vector that acts like a queue (first in , first out), but has control over every element and its order in the container.
+    template<class Ty>
+    class OMEGACOMMON_EXPORT   QueueVector
+    {
+        Ty *_data;
+    public:
+        using size_type = unsigned;
+    private:
+        size_type len = 0;
+    public:
+        using iterator = Ty *;
+        using reference = Ty &;
+        const size_type & size() noexcept {return len;};
+        bool empty() noexcept {return len == 0;};
+        iterator begin(){ return _data;};
+        iterator end(){return _data + (len * sizeof(Ty));};
+        reference first(){ return begin()[0];};
+        reference last(){ return end()[-1];};
+        reference operator[](size_type idx){ return begin()[idx];};
+    private:
+        void _push_el(const Ty & el){
+            if(len == 0)
+                _data = new Ty(std::move(el));
+            else {
+                Ty temp[len];
+                std::move(begin(),end(),temp);
+                delete [] _data;
+                _data = new Ty[len + 1];
+                std::move(temp,temp + (sizeof(Ty) * len),begin());
+                begin()[len] = std::move(el);
+            };
+            ++len;
+        };
+        void _insert_el_at_idx(const Ty & el,size_type & idx){
+            if(len == 0) {
+                assert(idx == 0 && "Cannot emplace item at requested index! No mem allocated!");
+                _data = new Ty(std::move(el));
+            }
+            else {
+                assert(idx < len && "Index is out of range!");
+                Ty temp[len + 1];
+                std::move(begin(),begin() + (idx * sizeof(Ty)),temp);
+                temp[idx] = std::move(el);
+                std::move(begin() + (idx * sizeof(Ty)),end(),temp + ((idx+1) * sizeof(Ty)));
+                delete [] _data;
+                _data = new Ty[len + 1];
+                std::move(temp,temp + (sizeof(Ty) * (len + 1)),begin());
+            };
+            ++len;
+        };
+    public:
+        void insert(const Ty & el,size_type idx){
+            _insert_el_at_idx(el,idx);
+        };
+        void insert(Ty && el,size_type idx){
+            _insert_el_at_idx(el,idx);
+        };
+        void push(const Ty & el){
+            _push_el(el);
+        };
+        void push(Ty && el){
+            _push_el(el);
+        };
+        void pop(){
+            assert(!empty() && "Cannot call pop() on empty QueueVector!");
+            auto f_el = first();
+            f_el.~Ty();
+            Ty temp[len-1];
+            std::move(begin() + sizeof(Ty),end(),temp);
+            delete [] _data;
+            --len;
+            _data = new Ty[len];
+            std::move(temp,temp + (len * sizeof(Ty)),begin());
+        };
+        QueueVector():_data(nullptr),len(0){};
+        QueueVector(const QueueVector<Ty> & other):len(other.len){
+            _data = new Ty[len];
+            std::copy(other.begin(),other.end(),begin());
+        };
+        QueueVector(QueueVector<Ty> && other):len(other.len){
+            _data = new Ty[len];
+            std::copy(other.begin(),other.end(),begin());
+
+        };
+        ~QueueVector(){
+            auto it = begin();
+            while(it != end()){
+                reference item = *it;
+                item.~Ty();
+                ++it;
+            };
+            delete [] _data;
+        };
+
+    };
+
+    /** @brief A queue data type that preallocates its memory on the heap that has a limited capacity, however it can be resized when nesscary.
+            @paragraph
+             This class typically gets used in a scenario
+             where there could be thousands of objects that get dynamically constructed and destroyed by a standard data type such as std::vector
+             but in a scenario as such, all the standard types are extremely inefficient and can cause fragmented memory.
+
+             The QueueHeap class has a similar implementation to a heap data type rather it has more control over how the data gets copied to/removed from the heap.
+             In addition, it only allows construction/destruction of objects in the notions of a "first in, first out" data type.
+        */
+    template<class Ty>
+    class QueueHeap {
+        std::allocator<Ty> _alloc;
+    protected:
+        Ty *_data;
+    public:
+        using size_type = unsigned;
+    private:
+        size_type len = 0;
+        size_type max_len;
+    public:
+        using reference = Ty &;
+        bool empty() noexcept {return len == 0;};
+        bool full() noexcept {return len == max_len;};
+        size_type & length(){ return len;};
+        reference first(){ return _data[0];};
+        reference last(){ return _data[len-1];};
+    protected:
+        void _push_el(const Ty & el){
+            memcpy(_data + len,&el,sizeof(Ty));
+            ++len;
+        };
+    public:
+        virtual void push(const Ty & el){
+            _push_el(el);
+        };
+        virtual void push(Ty && el){
+            _push_el(el);
+        };
+        void pop(){
+            assert(!empty() && "Cannot call pop() on empty QueueHeap!");
+            first().~Ty();
+            --len;
+            memcpy(_data,_data + 1,sizeof(Ty) * len);
+        };
+        void resize(size_type new_max_size){
+            assert(max_len < new_max_size && "");
+            _alloc.deallocate(_data,max_len);
+            _data = _alloc.allocate(new_max_size);
+            max_len = new_max_size;
+        };
+
+        explicit QueueHeap(size_type max_size):_data((Ty *)_alloc.allocate(max_size)),max_len(max_size){
+
+        };
+        ~QueueHeap(){
+            _alloc.deallocate(_data,max_len);
+        };
+    };
+
+    template<class Ty,class Compare_Ty>
+    class PriorityQueueHeap : public QueueHeap<Ty> {
+        Compare_Ty comp;
+        using super = QueueHeap<Ty>;
+        void _sort(){
+            std::sort(super::_data,super::_data + this->length(),comp);
+        };
+    public:
+        void push(const Ty & el) override{
+            super::__push_el(el);
+            _sort();
+        };
+        void push(Ty && el) override{
+            super::__push_el(el);
+            _sort();
+        };
+
+        explicit PriorityQueueHeap(typename super::size_type max_size,Compare_Ty comp = Compare_Ty()):QueueHeap<Ty>(max_size),comp(comp){
+
+        };
+        ~PriorityQueueHeap() = default;
+    };
+
+
     struct RuntimeObject {
         unsigned refCount;
         void inc() { refCount += 1;};
