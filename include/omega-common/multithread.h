@@ -36,27 +36,15 @@ namespace OmegaCommon {
         ~Semaphore();
     };
 
-    class ChildProcess {
-#ifdef _WIN32
-        PROCESS_INFORMATION processInformation;
-#else
-        FILE *p_file = nullptr;
-        bool use_pipe;
-        pid_t pid;
-#endif
-    public:
-        static ChildProcess OpenWithStdoutPipe(const OmegaCommon::String & cmd,const char * args);
-        static ChildProcess Open(const OmegaCommon::String & cmd,const OmegaCommon::Vector<const char *> & args);
-        int wait();
-        ~ChildProcess();
-    };
-
     /// @brief A unidirectional transport bridge.
     /// @paragraph
     /// The pipe in this implementation is represented a one-way bridge between Point A and Point B.
-    class Pipe {
+    class OMEGACOMMON_EXPORT Pipe {
         bool sideA;
+        friend class ChildProcess;
 #ifdef _WIN32
+        HANDLE h;
+        HANDLE file_a,file_b;
 #else
         int pipe_fd[2];
 #endif
@@ -74,6 +62,27 @@ namespace OmegaCommon {
 
         ~Pipe();
     };
+
+    /// @brief A Subprocess of the current process.
+    class OMEGACOMMON_EXPORT ChildProcess {
+#ifdef _WIN32
+        bool off = false;
+        PROCESS_INFORMATION processInformation;
+        STARTUPINFO startupinfo;
+        Pipe pipe;
+        bool use_pipe;
+#else
+        FILE *p_file = nullptr;
+        bool use_pipe;
+        pid_t pid;
+#endif
+    public:
+        static ChildProcess OpenWithStdoutPipe(const OmegaCommon::String & cmd,const char * args);
+        static ChildProcess Open(const OmegaCommon::String & cmd,const OmegaCommon::Vector<const char *> & args);
+        int wait();
+        ~ChildProcess();
+    };
+
 };
 
 #endif

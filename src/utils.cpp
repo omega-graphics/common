@@ -68,6 +68,7 @@ namespace OmegaCommon {
             std::getline(in,str,';');
     #else
             std::getline(in,str,':');
+    #endif
 
             auto current_path = FS::Path(str).append(prog);
     #ifdef _WIN32
@@ -83,7 +84,6 @@ namespace OmegaCommon {
                 return true;
             }
         }
-    #endif
         return false;
     }
 

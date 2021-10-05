@@ -24,6 +24,15 @@ namespace OmegaCommon::FS {
         return attrs & FILE_ATTRIBUTE_REPARSE_POINT;
     };
 
+    Path Path::followSymlink() {
+        DWORD attrs = GetFileAttributesA(str().c_str());
+        HANDLE h = CreateFileA(_str.c_str(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS,NULL);
+        DWORD bufferLen = GetFinalPathNameByHandleA(h,NULL,0,FILE_NAME_OPENED);
+        auto pathBuf = new char[bufferLen];
+        GetFinalPathNameByHandleA(h,pathBuf,bufferLen,FILE_NAME_OPENED);
+        return {pathBuf};
+    }
+
     bool Path::exists(){
         return PathFileExistsA(str().c_str());
     };
@@ -52,7 +61,7 @@ namespace OmegaCommon::FS {
 
 
     StatusCode createDirectory(Path path){
-        BOOL success = CreateDirectoryA(path.absPath().c_str(),NULL);
+        BOOL success = CreateDirectoryA(path.str().c_str(),NULL);
         if(success){
             return Ok;
         }
@@ -62,7 +71,7 @@ namespace OmegaCommon::FS {
     };
 
     StatusCode deleteDirectory(Path path){
-        BOOL success = RemoveDirectoryA(path.absPath().c_str());
+        BOOL success = RemoveDirectoryA(path.str().c_str());
         if(success){
             return Ok;
         }
