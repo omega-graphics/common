@@ -15,11 +15,31 @@
 #endif
 #include <mutex>
 #include <thread>
+#include <future>
 
 #include <cassert>
 
 namespace OmegaCommon {
     typedef std::thread Thread;
+    typedef std::mutex Mutex;
+
+    template<class T>
+    using Async = std::future<T>;
+
+    template<class T>
+    class Promise {
+        std::promise<T> _prom;
+    public:
+        Async<T> async(){
+            return _prom.get_future();
+        };
+        void set(const T & val){
+            _prom.set_value(val);
+        }
+        void set(T && val){
+            _prom.set_value(val);
+        }
+    };
 
     class OMEGACOMMON_EXPORT Semaphore {
         #ifdef _WIN32
