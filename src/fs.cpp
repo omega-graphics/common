@@ -211,8 +211,6 @@
         return _str + PATH_SLASH + str;
     };
 
-    Path::~Path() = default;
-
     bool & DirectoryIterator::end(){
         return _end;
     };

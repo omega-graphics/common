@@ -69,7 +69,7 @@ namespace OmegaCommon {
 
         static void serialize(JSON & json,std::ostream & out);
 
-     
+        ~JSON() = default;
     };
 
     OMEGACOMMON_EXPORT std::istream & operator>>(std::istream & in,JSON & json);

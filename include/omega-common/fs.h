@@ -9,8 +9,7 @@
 #define PATH_SLASH '/'
 #endif
 
-namespace OmegaCommon {
-    namespace FS {
+namespace OmegaCommon::FS {
 
         /**
         @brief A platform specific filesystem path class.
@@ -19,15 +18,14 @@ namespace OmegaCommon {
         it supports rapid string concatnation as well absolute path resolution.
         */
         class OMEGACOMMON_EXPORT Path {
-            String _str;
-            
-            String _dir;
-            String _fname;
-            String _ext;
+            OmegaCommon::String _str;
+            OmegaCommon::String _dir;
+            OmegaCommon::String _fname;
+            OmegaCommon::String _ext;
 
             bool isRelative;
 
-            void parse(const String & str);
+            void parse(const OmegaCommon::String & str);
             typedef Path SELF;
         public:
             // const unsigned getTokenCount(){ return tokens.size();};
@@ -52,14 +50,14 @@ namespace OmegaCommon {
              @param str 
              @returns Path
             */
-            SELF & append(const String & str);
+            SELF & append(const OmegaCommon::String & str);
 
             /**
              @brief Appends a StrRef to the end of the path.
              @param str 
              @returns Path
             */
-            SELF & append(const StrRef & str);
+            SELF & append(const OmegaCommon::StrRef & str);
 
             /**
              Appends a CString to the end of the path.
@@ -73,52 +71,52 @@ namespace OmegaCommon {
              @param str 
              @returns Path
             */
-            SELF & concat(const String & str);
+            SELF & concat(const OmegaCommon::String & str);
 
             /**
              @brief Appends a StrRef to the end of the path.
              @param str 
              @returns Path
             */
-            SELF & concat(const StrRef & str);
+            SELF & concat(const OmegaCommon::StrRef & str);
 
             /// @name Concat Operators
             /// @{
             SELF operator+(const char *str);
 
-            SELF operator+(const String & str);
+            SELF operator+(const OmegaCommon::String & str);
 
-             SELF operator+(const StrRef & str);
+             SELF operator+(const OmegaCommon::StrRef & str);
             /// @}
             /**
              Retrieve the path as a string. (Relative path) 
              @returns String &
             */
-            String &str();
+            OmegaCommon::String &str();
 
             /**
              @brief Retrieves the top directory part of the path (if it has one).
              @returns String
             */
-            String & dir();
+            OmegaCommon::String & dir();
 
             /**
              @brief Retrieves the filename part of the path (if it has one).
              @returns String
             */
-            String & filename();
+            OmegaCommon::String & filename();
 
             /**
              @brief Retrieves the file extension of the path (if it has one).
              @returns String
             */
-            String & ext();
+            OmegaCommon::String & ext();
 
             /**
              @brief Gets the absolute path of this path
              @returns String
             */
-            String absPath();
+            OmegaCommon::String absPath();
             bool exists();
 
             bool isFile();
@@ -132,7 +130,8 @@ namespace OmegaCommon {
             Path(const char * str);
             Path(const String & str);
             Path(StrRef & str);
-            ~Path();
+            
+            ~Path() = default;
         };
 
         inline bool exists(Path path){
@@ -164,7 +163,6 @@ namespace OmegaCommon {
             SELF & operator++();
             ~DirectoryIterator();
         };
-    };
 };
 
 #endif

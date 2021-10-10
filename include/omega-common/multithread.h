@@ -24,20 +24,64 @@ namespace OmegaCommon {
     typedef std::mutex Mutex;
 
     template<class T>
-    using Async = std::future<T>;
+    class Async {
+        bool * hasValue;
+        Mutex & mutex;
+        T * _val;
+        template<class Ty>
+        friend class Promise;
+        explicit Async(bool * hasValue, Mutex & mutex, T * _val):
+        hasValue(hasValue),
+        mutex(mutex),
+        _val(_val){
+
+        }
+    public:
+        bool ready(){
+            std::lock_guard<Mutex> lk(mutex);
+            return *hasValue;
+        }
+        T & get(){
+            while(!ready());
+            return *_val;
+        }
+    };
 
     template<class T>
     class Promise {
-        std::promise<T> _prom;
+        Mutex mutex;
+        bool hasValue = false;
+        T *val;
     public:
+        Promise():mutex(),hasValue(false),val(nullptr){
+
+        };
+        Promise(const Promise &) = delete;
+        Promise(Promise && prom):
+        mutex(std::move(prom.mutex)),
+        hasValue(prom.hasValue),
+        val(prom.val){
+            
+        }
         Async<T> async(){
-            return _prom.get_future();
+            return Async<T>{&hasValue,mutex,val};
         };
         void set(const T & val){
-            _prom.set_value(val);
+           std::lock_guard<Mutex> lk(mutex);
+           if(!hasValue){
+                val = new T(val);
+                hasValue = true;
+           }
         }
         void set(T && val){
-            _prom.set_value(val);
+           std::lock_guard<Mutex> lk(mutex);
+           if(!hasValue){
+                val = new T(val);
+                hasValue = true;
+           }
+        }
+        ~Promise(){
+            delete val;
         }
     };
 

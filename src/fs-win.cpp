@@ -37,7 +37,7 @@ namespace OmegaCommon::FS {
         return PathFileExistsA(str().c_str());
     };
 
-    String Path::absPath(){
+    OmegaCommon::String Path::absPath(){
         auto n_dir = _dir;
         for(auto & c : n_dir){
             if(c == '/')

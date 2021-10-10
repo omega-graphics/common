@@ -1,3 +1,7 @@
+#ifndef __cplusplus
+#error OmegaCommon must be compiled as a C++ api
+#endif
+
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -11,6 +15,7 @@
 #include <cassert>
 #include <optional>
 #include <iostream>
+#include <algorithm>
 
 #ifdef _WIN32
 #ifdef OMEGACOMMON__BUILD__
@@ -36,7 +41,7 @@ namespace OmegaCommon {
         std::allocator<CharTY> alloc;
         CharTY *_data;
     public:
-        typedef unsigned size_type;
+        typedef unsigned int size_type;
     private:
         size_type _len;
         using SELF = StringBaseImpl<CharTY>;
@@ -109,9 +114,9 @@ namespace OmegaCommon {
             std::copy(other.begin(),other.end(),_data);
         };
         StringBaseImpl(const char *cstr){
-            size_type l = strlen(cstr);
+            size_t l = strlen(cstr);
             _data = alloc.allocate(l);
-            _len = l;
+            _len = (size_type)l;
             std::move(cstr,cstr + l,_data);
         };
         StringBaseImpl(char * cbuf,size_type len){
@@ -186,7 +191,7 @@ namespace OmegaCommon {
 
         };
 
-        StrRefBase(const std::basic_string<CharTY> & str):_data(str.data()),_len(str.size()){
+        StrRefBase(const std::basic_string<CharTY> & str):_data(str.data()),_len((size_type)str.size()){
 
         }
 
@@ -194,7 +199,7 @@ namespace OmegaCommon {
 
         }
 
-        StrRefBase(const CharTY *c_str):_data(const_cast<char *>(c_str)),_len(strlen(c_str)){
+        StrRefBase(const CharTY *c_str):_data(const_cast<char *>(c_str)),_len((size_type)strlen(c_str)){
 
         }
 
@@ -313,7 +318,7 @@ namespace OmegaCommon {
 
 
     template<class T,unsigned len>
-    using Array = std::array<T,len>;
+    using Array = std::array<T,(size_t)len>;
 
     /** 
       The base class for all container reference classes.
@@ -323,9 +328,9 @@ namespace OmegaCommon {
     protected:
         T *_data;
     public:
-        typedef unsigned size_type;
+        typedef unsigned int size_type;
     protected:
-        size_type _size;
+        const size_type _size;
     public:
         typedef const T * const_iterator;
         typedef const T & const_reference;
@@ -334,22 +339,22 @@ namespace OmegaCommon {
             return _size == 0;
         };
 
-        size_type & size(){
+        const size_type & size() const{
             return _size;
         };
         
-        const_iterator begin(){
+        const_iterator begin() const{
             return const_iterator(_data);
         };
-        const_iterator end(){
+        const_iterator end() const{
             return const_iterator(_data + _size);
         };
 
-        const_reference front(){
+        const_reference front() const{
             return begin()[0];
         };
 
-        const_reference back(){
+        const_reference back() const{
             return end()[-1];
         };
 
@@ -387,7 +392,7 @@ namespace OmegaCommon {
             
         };
 
-        template<size_t len>
+        template<size_type len>
         ArrayRef(Array<T,len> & array):ContainerRefBase<T>(array.data(),len){
             
         };
@@ -467,7 +472,7 @@ namespace OmegaCommon {
     {
         Ty *_data;
     public:
-        using size_type = unsigned;
+        typedef unsigned int size_type;
     private:
         size_type len = 0;
     public:
