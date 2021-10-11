@@ -26,21 +26,21 @@ namespace OmegaCommon {
     template<class T>
     class Async {
         bool * hasValue;
-        Mutex & mutex;
+        Mutex * mutex;
         T * _val;
 
         template<class Ty>
         friend class Promise;
 
     public:
-        explicit Async(bool * hasValue, Mutex & mutex, T * _val):
+        explicit Async(bool * hasValue, Mutex * mutex, T * _val):
         hasValue(hasValue),
         mutex(mutex),
         _val(_val){
 
         }
         bool ready(){
-            std::lock_guard<Mutex> lk(mutex);
+            std::lock_guard<Mutex> lk(*mutex);
             return *hasValue;
         }
         T & get(){
@@ -66,7 +66,7 @@ namespace OmegaCommon {
             
         }
         Async<T> async(){
-            return Async<T>{&hasValue,*mutex,val};
+            return Async<T>{&hasValue,mutex,val};
         };
         void set(const T & v){
            std::lock_guard<Mutex> lk(*mutex);
