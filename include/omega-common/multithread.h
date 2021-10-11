@@ -28,15 +28,17 @@ namespace OmegaCommon {
         bool * hasValue;
         Mutex & mutex;
         T * _val;
+
         template<class Ty>
         friend class Promise;
+
+    public:
         explicit Async(bool * hasValue, Mutex & mutex, T * _val):
         hasValue(hasValue),
         mutex(mutex),
         _val(_val){
 
         }
-    public:
         bool ready(){
             std::lock_guard<Mutex> lk(mutex);
             return *hasValue;
@@ -49,39 +51,40 @@ namespace OmegaCommon {
 
     template<class T>
     class Promise {
-        Mutex mutex;
+        Mutex * mutex;
         bool hasValue = false;
         T *val;
     public:
-        Promise():mutex(),hasValue(false),val(nullptr){
+        Promise():mutex(new Mutex()),hasValue(false),val(nullptr){
 
         };
         Promise(const Promise &) = delete;
         Promise(Promise && prom):
-        mutex(std::move(prom.mutex)),
-        hasValue(prom.hasValue),
-        val(prom.val){
+                mutex(prom.mutex),
+                hasValue(prom.hasValue),
+                val(prom.val){
             
         }
         Async<T> async(){
-            return Async<T>{&hasValue,mutex,val};
+            return Async<T>{&hasValue,*mutex,val};
         };
-        void set(const T & val){
-           std::lock_guard<Mutex> lk(mutex);
+        void set(const T & v){
+           std::lock_guard<Mutex> lk(*mutex);
            if(!hasValue){
-                val = new T(val);
+                val = new T(v);
                 hasValue = true;
            }
         }
-        void set(T && val){
-           std::lock_guard<Mutex> lk(mutex);
+        void set(T && v){
+           std::lock_guard<Mutex> lk(*mutex);
            if(!hasValue){
-                val = new T(val);
+                val = new T(v);
                 hasValue = true;
            }
         }
         ~Promise(){
             delete val;
+            delete mutex;
         }
     };
 

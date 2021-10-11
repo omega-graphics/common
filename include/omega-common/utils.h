@@ -359,7 +359,7 @@ namespace OmegaCommon {
         };
 
         template<class _iterator>
-        ContainerRefBase(_iterator _st,_iterator _end):_data(_st),_size(_end - _st){
+        ContainerRefBase(_iterator _st,_iterator _end):_data(_st),_size(size_type(_end - _st)){
 
         };
 
@@ -388,7 +388,7 @@ namespace OmegaCommon {
         };
         
 
-        ArrayRef(Vector<T> & vec):ContainerRefBase<T>(vec.begin(),vec.end()){
+        ArrayRef(Vector<T> & vec):ContainerRefBase<T>(vec.data(),(size_type)vec.size()){
             
         };
 
@@ -406,6 +406,11 @@ namespace OmegaCommon {
     ArrayRef<T> operator&(Vector<T> & other){
         return other;
     };
+
+    template<class T>
+    ArrayRef<T> makeArrayRef(T * begin,T * end){
+        return {begin,end};
+    }
 
     template<class K,class V>
     using Map = std::map<K,V>;
@@ -630,11 +635,11 @@ namespace OmegaCommon {
         };
     public:
         void push(const Ty & el) override{
-            super::__push_el(el);
+            super::_push_el(el);
             _sort();
         };
         void push(Ty && el) override{
-            super::__push_el(el);
+            super::_push_el(el);
             _sort();
         };
 
