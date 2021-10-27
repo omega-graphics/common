@@ -4,6 +4,7 @@
 
 #include <string>
 #include <fstream>
+#include <assert.h>
 #include <sstream>
 #include <type_traits>
 #include <vector>
@@ -12,7 +13,6 @@
 #include <cstring>
 #include <typeinfo>
 #include <memory>
-#include <cassert>
 #include <optional>
 #include <iostream>
 #include <algorithm>
