@@ -590,9 +590,34 @@ namespace OmegaCommon {
         using reference = Ty &;
         bool empty() noexcept {return len == 0;};
         bool full() noexcept {return len == max_len;};
+
+        /// @brief Gets the length of the Queue Heap
         size_type & length(){ return len;};
+
+        /// @brief Returns a reference to the first element.
         reference first(){ return _data[0];};
+
+        /// @brief Returns a reference to the last element.
         reference last(){ return _data[len-1];};
+        template<class Pred>
+        void filter(Pred pred){
+            auto _end = std::remove_if(_data,_data + len,pred);
+            auto it_end = _data + len;
+            unsigned count = 0;
+            while(_end != it_end){
+                _end->~Ty();
+                ++_end;
+                count += 1;
+            }
+            auto newSize = len - count;
+            auto temp = _alloc.allocate(newSize);
+            memcpy(temp,_data,newSize);
+            _alloc.deallocate(_data,len);
+            _data = _alloc.allocate(newSize);
+            memcpy(_data,temp,newSize);
+            _alloc.deallocate(_data,newSize);
+            len = newSize;
+        }
     protected:
         void _push_el(const Ty & el){
             memcpy(_data + len,&el,sizeof(Ty));
