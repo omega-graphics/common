@@ -165,4 +165,8 @@ namespace OmegaCommon::FS {
         };
 };
 
+inline OmegaCommon::FS::Path operator "" _FP(const char *path){
+    return {path};
+}
+
 #endif

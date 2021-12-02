@@ -25,6 +25,10 @@ namespace OmegaWrapGen {
 //        OmegaCommon::StrRef headerName;
     };
 
+    struct PythonGenSettings {
+        bool submoduleForCXXNamespace;
+    };
+
 
     class Gen : public TreeConsumer {
         friend class Parser;
@@ -52,7 +56,10 @@ namespace OmegaWrapGen {
         virtual void finish() = 0;
 
         static Gen *CreateCGen(CGenSettings & settings);
+        static Gen *CreatePythonGen(PythonGenSettings & settings);
     };
+
+
 
 };
 

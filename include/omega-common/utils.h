@@ -393,7 +393,7 @@ namespace OmegaCommon {
         };
 
         template<size_type len>
-        ArrayRef(Array<T,len> & array):ContainerRefBase<T>(array.data(),len){
+        ArrayRef(const Array<T,len> & array):ContainerRefBase<T>(array.data(),len){
             
         };
 
@@ -584,7 +584,7 @@ namespace OmegaCommon {
     public:
         using size_type = unsigned;
     private:
-        size_type len = 0;
+        size_type len;
         size_type max_len;
     public:
         using reference = Ty &;
@@ -620,7 +620,7 @@ namespace OmegaCommon {
         }
     protected:
         void _push_el(const Ty & el){
-            memcpy(_data + len,&el,sizeof(Ty));
+            new (_data + len) Ty(el);
             ++len;
         };
     public:
@@ -632,7 +632,7 @@ namespace OmegaCommon {
         };
         void pop(){
             assert(!empty() && "Cannot call pop() on empty QueueHeap!");
-            first().~Ty();
+            _data[0].~Ty();
             --len;
             memcpy(_data,_data + 1,sizeof(Ty) * len);
         };
@@ -643,10 +643,10 @@ namespace OmegaCommon {
             max_len = new_max_size;
         };
 
-        explicit QueueHeap(size_type max_size):_data((Ty *)_alloc.allocate(max_size)),max_len(max_size){
+        explicit QueueHeap(size_type max_size):_data((Ty *)_alloc.allocate(max_size)),max_len(max_size),len(0){
 
         };
-        ~QueueHeap(){
+        virtual ~QueueHeap(){
             _alloc.deallocate(_data,max_len);
         };
     };
@@ -656,7 +656,7 @@ namespace OmegaCommon {
         Compare_Ty comp;
         using super = QueueHeap<Ty>;
         void _sort(){
-            std::sort(super::_data,super::_data + this->length(),comp);
+            std::sort(super::_data,super::_data + super::length(),comp);
         };
     public:
         void push(const Ty & el) override{
@@ -671,7 +671,7 @@ namespace OmegaCommon {
         explicit PriorityQueueHeap(typename super::size_type max_size,Compare_Ty comp = Compare_Ty()):QueueHeap<Ty>(max_size),comp(comp){
 
         };
-        ~PriorityQueueHeap() = default;
+        ~PriorityQueueHeap() override = default;
     };
 
 

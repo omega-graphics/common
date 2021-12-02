@@ -135,28 +135,32 @@ namespace OmegaCommon {
         };
 
         JSON parseToJSON(JSONTok & firstTok){
-            JSON j;
+            JSON j {};
             /// Map
             if(firstTok.type == JSONTok::LBrace){
                 firstTok = lexer->nextTok();
                 j.ty = JSON_MAP;
                 auto data = new Map<String,JSON>();
                 while(firstTok.type != JSONTok::RBrace){
-                    if(firstTok.type != JSONTok::StrLiteral)
+                    if(firstTok.type != JSONTok::StrLiteral) {
                         JSON_ERROR("Expected a StrLiteral")
+                    }
                     auto key = firstTok.str;
-                    if(lexer->nextTok().type != JSONTok::Colon)
+                    if(lexer->nextTok().type != JSONTok::Colon) {
                         JSON_ERROR("Expected a Colon!")
+                    }
                     
                     firstTok = lexer->nextTok();
                     auto val = parseToJSON(firstTok);
                     data->insert(std::make_pair(key,val));
 
                     firstTok = lexer->nextTok();
-                    if(firstTok.type != JSONTok::Comma && firstTok.type != JSONTok::RBrace)
+                    if(firstTok.type != JSONTok::Comma && firstTok.type != JSONTok::RBrace) {
                         JSON_ERROR("Expected Comma!")
-                    if(firstTok.type == JSONTok::Comma)
+                    }
+                    if(firstTok.type == JSONTok::Comma) {
                         firstTok = lexer->nextTok();
+                    }
                 };
                 j._data = data;
             }
@@ -244,6 +248,22 @@ namespace OmegaCommon {
         };
     };
 
+    bool JSON::isString() const {
+        return ty == JSON_STR;
+    }
+
+    bool JSON::isArray() const {
+        return ty == JSON_ARRAY;
+    }
+
+    bool JSON::isMap() const {
+        return ty == JSON_MAP;
+    }
+
+    bool JSON::isNumber() const {
+        return ty == JSON_NUM;
+    }
+
     Map<String,JSON> & JSON::asMap(){
         assert(ty == JSON_MAP);
         return *(Map<String,JSON> *)_data;
@@ -317,7 +337,7 @@ namespace OmegaCommon {
     };
 
     std::ostream & operator<<(std::ostream & out,JSON & json){
-        // JSON::serialize(json,out);
+         JSON::serialize(json,out);
         return out;
     };
 

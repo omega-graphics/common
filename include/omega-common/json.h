@@ -22,9 +22,6 @@ namespace OmegaCommon {
 
         static std::unique_ptr<JSONSerializer> serializer;
 
-        static JSON __parse(std::istream & in);
-        static void __serialize(JSON &json,std::ostream & out);
-
         unsigned ty;
 
         void *_data;
@@ -44,6 +41,14 @@ namespace OmegaCommon {
         
         /// Construct JSON as Map
         JSON(std::map<String,JSON> map);
+
+        bool isString() const;
+
+        bool isArray() const;
+
+        bool isNumber() const;
+
+        bool isMap() const;
 
         /// Get this JSON node as a String.
         String & asString();

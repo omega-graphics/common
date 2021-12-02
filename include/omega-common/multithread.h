@@ -51,7 +51,7 @@ namespace OmegaCommon {
 
     template<class T>
     class Promise {
-        Mutex * mutex;
+        std::shared_ptr<Mutex>  mutex;
         bool hasValue = false;
         T *val;
     public:
@@ -66,7 +66,7 @@ namespace OmegaCommon {
             
         }
         Async<T> async(){
-            return Async<T>{&hasValue,mutex,val};
+            return Async<T>{&hasValue,mutex.get(),val};
         };
         void set(const T & v){
            std::lock_guard<Mutex> lk(*mutex);
@@ -84,7 +84,6 @@ namespace OmegaCommon {
         }
         ~Promise(){
             delete val;
-            delete mutex;
         }
     };
 

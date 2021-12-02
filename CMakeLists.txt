@@ -11,7 +11,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 include(OmegaGraphicsSuite)
 
-set(COMMON_SRCS "src/crt.c" "src/format.cpp" "src/json.cpp" "src/fs.cpp" "src/utils.cpp" "src/xml.cpp")
+set(COMMON_SRCS "src/crt.c" "src/format.cpp" "src/json.cpp" "src/fs.cpp" "src/utils.cpp")
 
 configure_file("src/Info.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
 
