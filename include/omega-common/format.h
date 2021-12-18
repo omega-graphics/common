@@ -77,8 +77,8 @@ namespace OmegaCommon {
         std::ostringstream out;
 //        auto t_args = std::make_tuple(std::forward<_Args>(args)...);
         std::array<ObjectFormatProviderBase *,sizeof...(args)> arrayArgs = {buildFormatProvider(std::forward<_Args>(args))...};
-        auto formatter = createFormatter(fmt,out);
-        format(formatter,arrayArgs);
+        Formatter * formatter = createFormatter(fmt,out);
+        format(formatter,{arrayArgs.begin(),arrayArgs.end()});
         freeFormatter(formatter);
         for(auto a : arrayArgs){
             delete a;

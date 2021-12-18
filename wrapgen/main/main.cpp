@@ -27,8 +27,8 @@ void printHelp(){
 
 int main(int argc,char *argv[]){
     /// Omit First Arg in `argv`
-    OmegaCommon::StrRef src_file;
-    OmegaCommon::StrRef output_dir;
+    char * src_file;
+    char * output_dir;
     --argc;
     unsigned i = 0;
     while(argc > 1){
@@ -51,13 +51,11 @@ int main(int argc,char *argv[]){
 
     std::ifstream in("./example.owrap");
 
-    if(!std::filesystem::exists(output_dir.data())){
-        std::filesystem::create_directory(output_dir.data());
+    if(!std::filesystem::exists(output_dir)){
+        std::filesystem::create_directory(output_dir);
     }
 //    std::string output_dir = "./dist";
-    OmegaWrapGen::GenContext gen_ctxt;
-    gen_ctxt.output_dir = output_dir;
-    gen_ctxt.name = OmegaCommon::FS::Path(src_file).filename();
+    OmegaWrapGen::GenContext gen_ctxt {OmegaCommon::FS::Path(src_file).filename(),output_dir};
 
     OmegaWrapGen::CGenSettings settings {OmegaWrapGen::CGenSettings::Retain};
     
