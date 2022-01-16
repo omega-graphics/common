@@ -756,6 +756,8 @@ namespace OmegaCommon {
         Ok,
         Failed
     } StatusCode;
+    template<class T>
+    using Optional = std::optional<T>;
 
 //    namespace Argv {
 //

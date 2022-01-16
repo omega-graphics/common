@@ -11,10 +11,12 @@ namespace OmegaCommon {
 
     struct HttpRequestDescriptor {
         StrRef url;
+        StrRef header;
     };
 
     struct HttpResponse {
-
+        size_t size;
+        void *data;
     };
 
     class OMEGACOMMON_EXPORT HttpClientContext {
