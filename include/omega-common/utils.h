@@ -17,6 +17,11 @@
 #include <iostream>
 #include <algorithm>
 
+
+
+#ifndef OMEGA_COMMON_COMMON_UTILS_H
+#define OMEGA_COMMON_COMMON_UTILS_H
+
 #ifdef _WIN32
 #ifdef OMEGACOMMON__BUILD__
 #define OMEGACOMMON_EXPORT __declspec(dllexport)
@@ -29,9 +34,9 @@
 
 #endif
 
+#define OMEGACOMMON_CLASS_ID CLASS_ID
 
-#ifndef OMEGA_COMMON_COMMON_UTILS_H
-#define OMEGA_COMMON_COMMON_UTILS_H
+#define OMEGACOMMON_CLASS(id) static constexpr char OMEGACOMMON_CLASS_ID[] = id;
 
 
 namespace OmegaCommon {

@@ -55,7 +55,7 @@ namespace OmegaCommon {
         bool hasValue = false;
         T *val;
     public:
-        Promise():mutex(new Mutex()),hasValue(false),val(nullptr){
+        Promise():mutex(new Mutex()),hasValue(false),val((T *)malloc(sizeof(T))){
 
         };
         Promise(const Promise &) = delete;
@@ -71,19 +71,19 @@ namespace OmegaCommon {
         void set(const T & v){
            std::lock_guard<Mutex> lk(*mutex);
            if(!hasValue){
-                val = new T(v);
+                new(val) T(v);
                 hasValue = true;
            }
         }
         void set(T && v){
            std::lock_guard<Mutex> lk(*mutex);
            if(!hasValue){
-                val = new T(v);
+                new(val) T(v);
                 hasValue = true;
            }
         }
         ~Promise(){
-            delete val;
+            free(val);
         }
     };
 

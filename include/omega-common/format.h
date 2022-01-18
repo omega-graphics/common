@@ -1,6 +1,8 @@
 #include "utils.h"
+#include <ctime>
 #include <tuple>
 #include <array>
+#include <memory>
 
 #ifndef OMEGA_COMMON_FORMAT_H
 #define OMEGA_COMMON_FORMAT_H
@@ -61,6 +63,23 @@ namespace OmegaCommon {
         }
     };
 
+    template<typename T>
+    struct FormatProvider<std::shared_ptr<T>>{
+         static void format(std::ostream & os,std::shared_ptr<T> & object){
+            os << "SharedHandle(0x" << std::hex << object.get() << std::dec << ") : " << std::flush;
+            FormatProvider<T>::format(os,*object);
+        }
+    };
+
+    template<typename T>
+    struct FormatProvider {
+        template<std::enable_if_t<std::is_array_v<decltype(T::OMEGACOMMON_CLASS_ID)>,int> = 0>
+        FormatProvider(){};
+        static void format(std::ostream & os,T & object){
+            os << "<" << T::OMEGACOMMON_CLASS_ID << ">";
+        }
+    };
+
     class Formatter;
 
     OMEGACOMMON_EXPORT Formatter *createFormatter(StrRef fmt, std::ostream & out);
@@ -78,7 +97,7 @@ namespace OmegaCommon {
 //        auto t_args = std::make_tuple(std::forward<_Args>(args)...);
         std::array<ObjectFormatProviderBase *,sizeof...(args)> arrayArgs = {buildFormatProvider(std::forward<_Args>(args))...};
         Formatter * formatter = createFormatter(fmt,out);
-        format(formatter,{arrayArgs.begin(),arrayArgs.end()});
+        format(formatter,{arrayArgs.data(),arrayArgs.data() + arrayArgs.size()});
         freeFormatter(formatter);
         for(auto a : arrayArgs){
             delete a;
@@ -86,6 +105,13 @@ namespace OmegaCommon {
         
         return out.str();
     };
+
+    template<class ..._Args>
+    void LogV(const char *fmt,_Args && ...args){
+        auto t = std::time(nullptr);
+        std::cout << "[" << "LOG" << "] " << fmtString(fmt,std::forward<_Args>(args)...) << std::endl;
+    }
+    
 };
 
 #endif

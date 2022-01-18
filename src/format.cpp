@@ -71,7 +71,7 @@ namespace OmegaCommon {
 
                             int val = scalableInteger.val();
 
-                            std::cout << "Value:" << val << std::endl;
+                            // std::cout << "Value:" << val << std::endl;
 
                             assert(val < objectFormatProviders.size());
                             objectFormatProviders[val]->insertFormattedObject(out);
