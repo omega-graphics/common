@@ -47,15 +47,17 @@ namespace OmegaCommon {
             while(!ready());
             return *_val;
         }
+        ~Async() = default;
     };
 
     template<class T>
     class Promise {
+
         std::shared_ptr<Mutex>  mutex;
-        bool hasValue = false;
-        T *val;
+        std::shared_ptr<bool> hasValue;
+        std::shared_ptr<T> val;
     public:
-        Promise():mutex(new Mutex()),hasValue(false),val((T *)malloc(sizeof(T))){
+        Promise():mutex(new Mutex()),hasValue(std::make_shared<bool>(false)),val((T *)new T()){
 
         };
         Promise(const Promise &) = delete;
@@ -66,25 +68,23 @@ namespace OmegaCommon {
             
         }
         Async<T> async(){
-            return Async<T>{&hasValue,mutex.get(),val};
+            return Async<T>{hasValue.get(),mutex.get(),val.get()};
         };
         void set(const T & v){
            std::lock_guard<Mutex> lk(*mutex);
            if(!hasValue){
-                new(val) T(v);
-                hasValue = true;
+                new(val.get()) T(v);
+                *hasValue = true;
            }
         }
         void set(T && v){
            std::lock_guard<Mutex> lk(*mutex);
            if(!hasValue){
-                new(val) T(v);
-                hasValue = true;
+                new(val.get()) T(v);
+                *hasValue = true;
            }
         }
-        ~Promise(){
-            free(val);
-        }
+        ~Promise() = default;
     };
 
     class OMEGACOMMON_EXPORT Semaphore {
