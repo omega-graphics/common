@@ -119,12 +119,6 @@ namespace OmegaCommon {
         };
     };
 
-    #define JSON_STR 0x00
-    #define JSON_ARRAY 0x01
-    #define JSON_MAP 0x02
-    #define JSON_BOOL 0x03
-    #define JSON_NUM 0x04
-
     #define JSON_ERROR(message) std::cerr << "JSON Parse Error:" << message << std::endl;exit(1);
 
     class JSONParser {
@@ -139,8 +133,9 @@ namespace OmegaCommon {
             /// Map
             if(firstTok.type == JSONTok::LBrace){
                 firstTok = lexer->nextTok();
-                j.ty = JSON_MAP;
-                auto data = new Map<String,JSON>();
+                j.type = JSON::MAP;
+                j.data = JSON::Data(JSON::MAP);
+                OmegaCommon::Map<String,JSON> m;
                 while(firstTok.type != JSONTok::RBrace){
                     if(firstTok.type != JSONTok::StrLiteral) {
                         JSON_ERROR("Expected a StrLiteral")
@@ -152,7 +147,7 @@ namespace OmegaCommon {
                     
                     firstTok = lexer->nextTok();
                     auto val = parseToJSON(firstTok);
-                    data->insert(std::make_pair(key,val));
+                    m.insert(std::make_pair(key,val));
 
                     firstTok = lexer->nextTok();
                     if(firstTok.type != JSONTok::Comma && firstTok.type != JSONTok::RBrace) {
@@ -162,27 +157,34 @@ namespace OmegaCommon {
                         firstTok = lexer->nextTok();
                     }
                 };
-                j._data = data;
+                j.data.map.data = new std::pair<String,JSON> [m.size()];
+                std::move(m.begin(),m.end(),j.data.map.data);
+                j.data.map.len = m.size();
             }
             /// Vector
             else if(firstTok.type == JSONTok::LBracket){
                 firstTok = lexer->nextTok();
-                auto data = new Vector<JSON>();
-                j.ty = JSON_ARRAY;
+              
+                j.type = JSON::ARRAY;
+                j.data = JSON::Data(JSON::ARRAY);
+                OmegaCommon::Vector<JSON> v;
                 while(firstTok.type != JSONTok::RBracket){
-                    data->push_back(parseToJSON(firstTok));
+                    v.push_back(parseToJSON(firstTok));
                     firstTok = lexer->nextTok();
                     if(firstTok.type != JSONTok::Comma && firstTok.type != JSONTok::RBracket)
                         JSON_ERROR("Expected Comma!")
                     if(firstTok.type == JSONTok::Comma)
                         firstTok = lexer->nextTok();
                 };
-                j._data = data;
+                j.data.array.data = new JSON[v.size()];
+                j.data.array.len = v.size();
+                std::move(v.begin(),v.end(),j.data.array.data);
+                v.resize(0);
             }
             /// String
             else if(firstTok.type == JSONTok::StrLiteral){
-                j.ty = JSON_STR;
-                j._data = new String(firstTok.str);
+                j.type = JSON::STRING;
+                j.data = JSON::Data(firstTok.str);
             }
 
             /// Number
@@ -211,33 +213,33 @@ namespace OmegaCommon {
         };
         void serializeToStream(JSON & j){
             auto & out = *this->out;
-            if(j.ty == JSON_MAP){
+            if(j.type == JSON::MAP){
                 out << "{";
-                auto & map = j.asMap();
+                auto map = j.asMap();
                 for(auto it = map.begin();it != map.end();it++){
                     if(it == map.begin())
                         out << ",";
                     auto & ent = *it;
                     out << "\"" << ent.first << "\":";
-                    serializeToStream(ent.second);
+                    serializeToStream(const_cast<JSON &>(ent.second));
                     ++it;
                 };
                 out << "}";
             }
-            else if(j.ty == JSON_ARRAY){
+            else if(j.type == JSON::ARRAY){
                 out << "[";
-                auto & vec = j.asVector();
+                auto vec = j.asVector();
                 for(auto it = vec.begin();it != vec.end();it++){
                     if(it == vec.end())
                         out << ",";
                     auto & ent = *it;
-                    serializeToStream(ent);
+                    serializeToStream(const_cast<JSON &>(ent));
                     ++it;
                 };
                 out << "]";
             }
-            else if(j.ty == JSON_STR){
-                out << "\"" << j.asString() << "\"";
+            else if(j.type == JSON::STRING){
+                out << "\"" << j.asString().data() << "\"";
             };
         };
         void serialize(JSON & j){
@@ -249,34 +251,34 @@ namespace OmegaCommon {
     };
 
     bool JSON::isString() const {
-        return ty == JSON_STR;
+        return type == STRING;
     }
 
     bool JSON::isArray() const {
-        return ty == JSON_ARRAY;
+        return type == ARRAY;
     }
 
     bool JSON::isMap() const {
-        return ty == JSON_MAP;
+        return type == MAP;
     }
 
     bool JSON::isNumber() const {
-        return ty == JSON_NUM;
+        return type == NUMBER;
     }
 
-    Map<String,JSON> & JSON::asMap(){
-        assert(ty == JSON_MAP);
-        return *(Map<String,JSON> *)_data;
+    MapRef<String,JSON> JSON::asMap(){
+        assert(isMap());
+        return {data.map.data,data.map.data + data.map.len};
     };
 
-    Vector<JSON> & JSON::asVector(){
-        assert(ty == JSON_ARRAY);
-        return *(Vector<JSON> *)_data;
+    ArrayRef<JSON> JSON::asVector(){
+        assert(isArray());
+        return {data.array.data,data.array.data + data.array.len};
     };
 
-    String & JSON::asString(){
-        assert(ty == JSON_STR);
-        return *(String *)_data;
+    StrRef JSON::asString(){
+        assert(isString());
+        return {data.str};
     };
 
     std::unique_ptr<JSONParser> JSON::parser = std::make_unique<JSONParser>();
@@ -312,22 +314,50 @@ namespace OmegaCommon {
         serializer->finish();
     };
 
-    JSON::JSON(const char *c_str):ty(JSON_STR),_data(new String(c_str)){
+    JSON::Data::Data(decltype(JSON::type) t) : Data(){
+        if(t == ARRAY){
+            array.data = nullptr;
+            array.len = 0;
+        }
+        else {
+            map.data = nullptr;
+            map.len = 0;
+        }
+    }
+
+    JSON::Data::Data(StrRef str) : str(new char [str.size()]){
+        std::move(str.begin(),str.end(),this->str);
+    }
+
+    JSON::Data::Data(ArrayRef<JSON> array) : array(){
+        this->array.data = (JArray)std::malloc(sizeof(JSON) * array.size());
+        this->array.len = array.size();
+        std::move(array.begin(),array.end(),this->array.data);
+    }
+
+    JSON::Data::Data(MapRef<String,JSON> map) : map(){
+        this->map.data = (JMap)std::malloc(sizeof(std::pair<String,JSON>) * map.size());
+        this->map.len = map.size();
+        std::move(map.begin(),map.end(),this->map.data);
+    }
+    
+
+    JSON::JSON(const char *c_str):type(STRING),data(c_str){
 
     };
 
      /// Construct JSON as String
-    JSON::JSON(String str):ty(JSON_STR),_data(new String(str)){
+    JSON::JSON(const String & str):type(STRING),data(str){
 
     };
 
     /// Construct JSON as Array
-    JSON::JSON(std::initializer_list<JSON> array):ty(JSON_ARRAY),_data(new Vector<JSON>(array)){
+    JSON::JSON(std::initializer_list<JSON> array):type(ARRAY),data(ArrayRef<JSON>{array.begin(),array.end()}){
 
     };
         
     /// Construct JSON as Map
-    JSON::JSON(std::map<String,JSON> map):ty(JSON_MAP),_data(new Map<String,JSON>(map)){
+    JSON::JSON(std::map<String,JSON> map):type(MAP),data(map){
 
     };
 

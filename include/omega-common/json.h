@@ -22,19 +22,57 @@ namespace OmegaCommon {
 
         static std::unique_ptr<JSONSerializer> serializer;
 
-        unsigned ty;
+        enum : int {
+            STRING,
+            ARRAY,
+            MAP,
+            NUMBER,
+            BOOLEAN,
+            UNKNOWN
+        } type = UNKNOWN;
 
-        void *_data;
+        typedef char *JString;
+
+        typedef JSON *JArray;
+
+        typedef std::pair<String,JSON> *JMap;
+
+        typedef int JNumber;
+
+        union Data {
+            JString str;
+            struct {
+                JArray data;
+                unsigned len;
+            } array;
+            struct {
+                JMap data;
+                unsigned len;
+            } map;
+            JNumber number;
+            Data() = default;
+            Data(decltype(type) t);
+            Data(OmegaCommon::StrRef str);
+            Data(OmegaCommon::ArrayRef<JSON> array);
+            Data(OmegaCommon::MapRef<String,JSON> map);
+            void _destroy(decltype(type) t);
+        } data;
+
+        
         friend class JSONParser;
         friend class JSONSerializer;
     public:
+        typedef JMap map_iterator;
+
+        typedef JArray array_iterator;
+
         JSON() = default;
 
         /// Construct JSON as String
         JSON(const char *c_str);
 
-        /// Construct JSON as String
-        JSON(String str);
+         /// Construct JSON as String
+        JSON(const String & str);
 
         /// Construct JSON as Array
         JSON(std::initializer_list<JSON> array);
@@ -51,20 +89,32 @@ namespace OmegaCommon {
         bool isMap() const;
 
         /// Get this JSON node as a String.
-        String & asString();
+        OmegaCommon::StrRef asString();
         
         /// Get this JSON node as a Vector 
         /// (From a JSON Array).
-        Vector<JSON> & asVector();
+        ArrayRef<JSON> asVector();
 
         /// Get this JSON node as a Map.
-        Map<String,JSON> & asMap();
+        MapRef<String,JSON> asMap();
 
         float asFloat();
 
-        bool asBool();
+        bool & asBool();
+
+        // /// @name Mod Methods 
+        // /// @{
+
+        // JSON & operator[](OmegaCommon::StrRef str);
+
+        // map_iterator insert(const std::pair<String,JSON> & p);
+
+        // void push_back(const JSON & j);
+
+        /// @}
 
 
+        
 
         static JSON parse(String str);
 

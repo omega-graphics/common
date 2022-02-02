@@ -453,6 +453,11 @@ namespace OmegaCommon {
             return res->second;
         };
 
+        template<class __It>
+        MapRef(__It beg,__It end):ContainerRefBase<std::pair<K,V>>(beg,end){
+            
+        };
+
         MapRef(Map<K,V> & map):ContainerRefBase<std::pair<K,V>>(map.begin(),map.end()){
 
         };
