@@ -45,10 +45,7 @@ namespace OmegaCommon {
                 JArray data;
                 unsigned len;
             } array;
-            struct {
-                JMap data;
-                unsigned len;
-            } map;
+            OmegaCommon::Map<String,JSON> *map;
             JNumber number;
             Data() = default;
             Data(decltype(type) t);

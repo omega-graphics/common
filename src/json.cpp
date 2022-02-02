@@ -135,7 +135,8 @@ namespace OmegaCommon {
                 firstTok = lexer->nextTok();
                 j.type = JSON::MAP;
                 j.data = JSON::Data(JSON::MAP);
-                OmegaCommon::Map<String,JSON> m;
+                j.data.map = new Map<String,JSON>();
+                OmegaCommon::Map<String,JSON> & m = *j.data.map;
                 while(firstTok.type != JSONTok::RBrace){
                     if(firstTok.type != JSONTok::StrLiteral) {
                         JSON_ERROR("Expected a StrLiteral")
@@ -157,9 +158,6 @@ namespace OmegaCommon {
                         firstTok = lexer->nextTok();
                     }
                 };
-                j.data.map.data = new std::pair<String,JSON> [m.size()];
-                std::move(m.begin(),m.end(),j.data.map.data);
-                j.data.map.len = m.size();
             }
             /// Vector
             else if(firstTok.type == JSONTok::LBracket){
@@ -268,7 +266,7 @@ namespace OmegaCommon {
 
     MapRef<String,JSON> JSON::asMap(){
         assert(isMap());
-        return {data.map.data,data.map.data + data.map.len};
+        return *data.map;
     };
 
     ArrayRef<JSON> JSON::asVector(){
@@ -320,8 +318,7 @@ namespace OmegaCommon {
             array.len = 0;
         }
         else {
-            map.data = nullptr;
-            map.len = 0;
+            map = nullptr;
         }
     }
 
@@ -335,10 +332,8 @@ namespace OmegaCommon {
         std::move(array.begin(),array.end(),this->array.data);
     }
 
-    JSON::Data::Data(MapRef<String,JSON> map) : map(){
-        this->map.data = (JMap)std::malloc(sizeof(std::pair<String,JSON>) * map.size());
-        this->map.len = map.size();
-        std::move(map.begin(),map.end(),this->map.data);
+    JSON::Data::Data(MapRef<String,JSON> map) : map(new Map<String,JSON>(map.begin(),map.end())){
+
     }
     
 
@@ -352,7 +347,10 @@ namespace OmegaCommon {
     };
 
     /// Construct JSON as Array
-    JSON::JSON(std::initializer_list<JSON> array):type(ARRAY),data(ArrayRef<JSON>{array.begin(),array.end()}){
+    JSON::JSON(std::initializer_list<JSON> array):type(ARRAY),data(ArrayRef<JSON>{
+            const_cast<JSON *>(array.begin()),
+            const_cast<JSON *>(array.end())
+    }){
 
     };
         
