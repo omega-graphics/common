@@ -2,6 +2,7 @@
 #include <initializer_list>
 #include <istream>
 #include <sstream>
+#include <type_traits>
 
 #ifndef OMEGA_COMMON_JSON_H
 #define OMEGA_COMMON_JSON_H
@@ -35,20 +36,17 @@ namespace OmegaCommon {
 
         typedef JSON *JArray;
 
-        typedef std::pair<String,JSON> *JMap;
-
         typedef int JNumber;
 
         union Data {
             JString str;
-            struct {
-                JArray data;
-                unsigned len;
-            } array;
+            bool b;
+            OmegaCommon::Vector<JSON> *array;
             OmegaCommon::Map<String,JSON> *map;
             JNumber number;
             Data() = default;
             Data(decltype(type) t);
+            Data(bool & b);
             Data(OmegaCommon::StrRef str);
             Data(OmegaCommon::ArrayRef<JSON> array);
             Data(OmegaCommon::MapRef<String,JSON> map);
@@ -59,9 +57,9 @@ namespace OmegaCommon {
         friend class JSONParser;
         friend class JSONSerializer;
     public:
-        typedef JMap map_iterator;
+        typedef std::remove_pointer_t<decltype(data.map)>::iterator map_iterator;
 
-        typedef JArray array_iterator;
+        typedef std::remove_pointer_t<decltype(data.array)>::iterator array_iterator;
 
         JSON() = default;
 
@@ -70,6 +68,9 @@ namespace OmegaCommon {
 
          /// Construct JSON as String
         JSON(const String & str);
+
+        /// Construct JSON as Boolean
+        JSON(bool b);
 
         /// Construct JSON as Array
         JSON(std::initializer_list<JSON> array);
@@ -102,11 +103,11 @@ namespace OmegaCommon {
         // /// @name Mod Methods 
         // /// @{
 
-        // JSON & operator[](OmegaCommon::StrRef str);
+        JSON & operator[](OmegaCommon::StrRef str);
 
-        // map_iterator insert(const std::pair<String,JSON> & p);
+        map_iterator insert(const std::pair<String,JSON> & p);
 
-        // void push_back(const JSON & j);
+        void push_back(const JSON & j);
 
         /// @}
 
@@ -136,6 +137,9 @@ namespace OmegaCommon {
     };
 
     #define IJSONConvertible public ::OmegaCommon::JSONConvertible
+
+
+    
 
 };
 

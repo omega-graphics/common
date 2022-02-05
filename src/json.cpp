@@ -165,7 +165,8 @@ namespace OmegaCommon {
               
                 j.type = JSON::ARRAY;
                 j.data = JSON::Data(JSON::ARRAY);
-                OmegaCommon::Vector<JSON> v;
+                j.data.array = new Vector<JSON>();
+                auto & v = *j.data.array;
                 while(firstTok.type != JSONTok::RBracket){
                     v.push_back(parseToJSON(firstTok));
                     firstTok = lexer->nextTok();
@@ -174,10 +175,6 @@ namespace OmegaCommon {
                     if(firstTok.type == JSONTok::Comma)
                         firstTok = lexer->nextTok();
                 };
-                j.data.array.data = new JSON[v.size()];
-                j.data.array.len = v.size();
-                std::move(v.begin(),v.end(),j.data.array.data);
-                v.resize(0);
             }
             /// String
             else if(firstTok.type == JSONTok::StrLiteral){
@@ -271,7 +268,7 @@ namespace OmegaCommon {
 
     ArrayRef<JSON> JSON::asVector(){
         assert(isArray());
-        return {data.array.data,data.array.data + data.array.len};
+        return *data.array;
     };
 
     StrRef JSON::asString(){
@@ -314,8 +311,7 @@ namespace OmegaCommon {
 
     JSON::Data::Data(decltype(JSON::type) t) : Data(){
         if(t == ARRAY){
-            array.data = nullptr;
-            array.len = 0;
+            array = nullptr;
         }
         else {
             map = nullptr;
@@ -326,13 +322,15 @@ namespace OmegaCommon {
         std::move(str.begin(),str.end(),this->str);
     }
 
-    JSON::Data::Data(ArrayRef<JSON> array) : array(){
-        this->array.data = (JArray)std::malloc(sizeof(JSON) * array.size());
-        this->array.len = array.size();
-        std::move(array.begin(),array.end(),this->array.data);
+    JSON::Data::Data(ArrayRef<JSON> array) : array(new Vector<JSON>(array.begin(),array.end())){
+        
     }
 
     JSON::Data::Data(MapRef<String,JSON> map) : map(new Map<String,JSON>(map.begin(),map.end())){
+
+    }
+
+    JSON::Data::Data(bool &b) : b(b){
 
     }
     
@@ -346,6 +344,10 @@ namespace OmegaCommon {
 
     };
 
+    JSON::JSON(bool b):type(BOOLEAN),data(b){
+
+    }
+
     /// Construct JSON as Array
     JSON::JSON(std::initializer_list<JSON> array):type(ARRAY),data(ArrayRef<JSON>{
             const_cast<JSON *>(array.begin()),
@@ -353,7 +355,22 @@ namespace OmegaCommon {
     }){
 
     };
+
+    JSON & JSON::operator[](OmegaCommon::StrRef str){
+        assert(isMap() && "Cannot insert pair unless object is Map");
+        return data.map->operator[](str);
+    }
         
+
+    JSON::map_iterator JSON::insert(const std::pair<String,JSON> & j){
+        assert(isMap() && "Cannot insert pair unless object is Map");
+        return data.map->insert(j).first;
+    }
+
+    void JSON::push_back(const JSON & j){
+        assert(isArray() && "Cannot push object unless is Array");
+        data.array->push_back(j);
+    }
     /// Construct JSON as Map
     JSON::JSON(std::map<String,JSON> map):type(MAP),data(map){
 
