@@ -9,9 +9,6 @@
 
 namespace OmegaCommon {
 
-    class JSONParser;
-    class JSONSerializer;
-
     /**
      @brief A simple class for parsing and serializing JSON, and for defining all of the JSON structures and data types.
      (Represents a single JSON object node in a JSON tree.)
@@ -19,9 +16,6 @@ namespace OmegaCommon {
      An instance of this class represents a single JSON Object Node in the JSON object tree.
     */
     class OMEGACOMMON_EXPORT JSON {
-        static std::unique_ptr<JSONParser> parser;
-
-        static std::unique_ptr<JSONSerializer> serializer;
 
         enum : int {
             STRING,

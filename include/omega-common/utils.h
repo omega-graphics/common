@@ -1,3 +1,4 @@
+#include <initializer_list>
 #ifndef __cplusplus
 #error OmegaCommon must be compiled as a C++ api
 #endif
@@ -196,7 +197,7 @@ namespace OmegaCommon {
     }
 
     typedef StrRefBase<char> StrRef;
-    typedef StrRefBase<wchar_t> WStrRef;
+    typedef StrRefBase<char16_t> WStrRef;
     typedef StrRefBase<char32_t> UStrRef;
 
 
@@ -710,6 +711,10 @@ namespace OmegaCommon {
     template<class T>
     using Optional = std::optional<T>;
 
+    #define string_enum_field static constexpr const char *
+    #define string_enum namespace
+
+
 //    namespace Argv {
 //
 //        template<class T>
@@ -820,7 +825,10 @@ namespace OmegaCommon {
 //        };
 //
 //    }
-    
+    template<class O,class T>
+    bool is(std::shared_ptr<T> &object){
+        return (dynamic_cast<O *>(object.get()) != nullptr);
+    };
 };
 
 bool findProgramInPath(const OmegaCommon::StrRef & prog,OmegaCommon::String & out);
@@ -836,5 +844,7 @@ inline std::wostream & operator<<(std::wostream &os,OmegaCommon::WStrRef &str){
 //inline std::basic_ostream<char32_t> & operator<<(std::basic_ostream<char32_t> &os,OmegaCommon::UStrRef &str){
 //    return os << str.data();
 //};
+
+
 
 #endif

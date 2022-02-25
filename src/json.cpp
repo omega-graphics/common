@@ -196,7 +196,7 @@ namespace OmegaCommon {
         void finish(){
             lexer->finish();
         };
-    };
+    } parser;
 
 
 
@@ -243,7 +243,7 @@ namespace OmegaCommon {
         void finish(){
             out = nullptr;
         };
-    };
+    } serializer;
 
     bool JSON::isString() const {
         return type == STRING;
@@ -276,24 +276,20 @@ namespace OmegaCommon {
         return {data.str};
     };
 
-    std::unique_ptr<JSONParser> JSON::parser = std::make_unique<JSONParser>();
-
-    std::unique_ptr<JSONSerializer> JSON::serializer = std::make_unique<JSONSerializer>();
-
 
     
     JSON JSON::parse(String str){
         std::istringstream in(str);
-        parser->setInputStream(&in);
-        auto j = parser->parse();
-        parser->finish();
+        parser.setInputStream(&in);
+        auto j = parser.parse();
+        parser.finish();
         return j;
     };
 
     JSON JSON::parse(std::istream & in){
-        parser->setInputStream(&in);
-        auto j = parser->parse();
-        parser->finish();
+        parser.setInputStream(&in);
+        auto j = parser.parse();
+        parser.finish();
         return j;
     };
 
@@ -304,9 +300,9 @@ namespace OmegaCommon {
     };
 
     void JSON::serialize(JSON & j,std::ostream & out){
-        serializer->setOutputStream(&out);
-        serializer->serialize(j);
-        serializer->finish();
+        serializer.setOutputStream(&out);
+        serializer.serialize(j);
+        serializer.finish();
     };
 
     JSON::Data::Data(decltype(JSON::type) t) : Data(){
@@ -332,6 +328,15 @@ namespace OmegaCommon {
 
     JSON::Data::Data(bool &b) : b(b){
 
+    }
+
+    void JSON::Data::_destroy(decltype(type) t){
+        if(t == MAP){
+            delete map;
+        }
+        else {
+            delete array;
+        }
     }
     
 
