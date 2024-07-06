@@ -94,11 +94,11 @@ namespace OmegaCommon {
     */
     template<class CharTY>
     class StrRefBase {
-        const CharTY *_data;
+        const CharTY *_data = nullptr;
     public:
         typedef unsigned size_type;
     private:
-        const size_type _len;
+        const size_type _len = 0;
         using SELF = StrRefBase<CharTY>;
     public:
         using const_iterator = const CharTY *;
@@ -149,6 +149,10 @@ namespace OmegaCommon {
         }
 
         StrRefBase(const CharTY *c_str):_data(const_cast<char *>(c_str)),_len((size_type)strlen(c_str)){
+
+        }
+
+        StrRefBase( CharTY *c_str):_data(c_str),_len((size_type)strlen(c_str)){
 
         }
 
@@ -840,6 +844,38 @@ inline std::ostream & operator<<(std::ostream &os,OmegaCommon::StrRef &str){
 inline std::wostream & operator<<(std::wostream &os,OmegaCommon::WStrRef &str){
     return os << str.data();
 };
+
+template<class _Ty>
+using SharedHandle = std::shared_ptr<_Ty>;
+/**Creates a Shared Instance of _Ty and returns it*/
+template<class _Ty,class... _Args>
+inline SharedHandle<_Ty> make(_Args && ...args){
+//    static_assert(std::is_constructible<_Ty,_Args...>::value,"Cannot construct item");
+    return std::make_shared<_Ty>(args...);
+};
+
+template<class _Ty>
+using UniqueHandle = std::unique_ptr<_Ty>;
+/**Creates a Unique Instance of _Ty and returns it*/
+template<class _Ty,class... _Args>
+inline UniqueHandle<_Ty> && construct(_Args && ...args){
+    static_assert(std::is_constructible<_Ty,_Args...>::value,"Cannot construct item");
+    return std::make_unique<_Ty>(args...);
+};
+/**
+ * @brief Creates a SharedHandle type-alias.
+ * 
+ */
+#define OMEGACOMMON_SHARED_CLASS(name) typedef SharedHandle<name> name##Ptr
+/**
+ * @brief Creates a SharedHandle type-alias.
+ * 
+ */
+#define OMEGACOMMON_UNIQUE_CLASS(name) typedef UniqueHandle<name> name##UPtr
+
+#define OMEGACOMMON_SHARED(name) name##Ptr;
+
+#define OMEGACOMMON_UNIQUE(name) name##UPtr;
 
 //inline std::basic_ostream<char32_t> & operator<<(std::basic_ostream<char32_t> &os,OmegaCommon::UStrRef &str){
 //    return os << str.data();
